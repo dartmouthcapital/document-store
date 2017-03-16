@@ -1,0 +1,8 @@
+.idea/
+.packages
+.pub/
+build/
+config.yaml
+test/config_test.yaml
+pubspec.lock
+doc/api/

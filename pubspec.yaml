@@ -1,0 +1,19 @@
+name: document_store
+description: An interface for serving and storing documents.
+version: 0.0.1
+homepage: https://www.safedinar.com
+author: Todd Mannherz <todd.mannherz@gmail.com>
+
+environment:
+  sdk: '>=1.20.1 <2.0.0'
+
+dependencies:
+  connection_pool:
+  dart_config:
+  logging:
+  mongo_dart:
+  shelf_rest:
+  shelf_exception_handler:
+
+dev_dependencies:
+  test:
