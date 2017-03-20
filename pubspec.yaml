@@ -12,7 +12,7 @@ dependencies:
   dart_config:
   logging:
   mongo_dart:
-  shelf_rest:
+  shelf_route:
   shelf_exception_handler:
 
 dev_dependencies:

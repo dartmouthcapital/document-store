@@ -1,4 +1,4 @@
-// Singleton config class
+/// Singleton config class
 class Config {
     static Config _singleton;
     Map config;
@@ -15,7 +15,7 @@ class Config {
 
     Config._internal(this.config);
 
-    // Get a field from the config.
+    /// Get a field from the config.
     static get(String key) {
         var parts = key.split('/'),
             last = parts.removeLast(),
@@ -36,7 +36,7 @@ class Config {
         return null;
     }
 
-    // Set a field in the config.
+    /// Set a field in the config.
     static set(String key, value) {
         var parts = key.split('/'),
             last = parts.removeLast(),

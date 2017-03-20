@@ -77,12 +77,11 @@ main() async {
     group('Testing POST/GET/DELETE cycle', () {
         var docId;
         test('POST new document', () async {
-            Request request = createRequest('POST', '/', body: '{"path": "a/doc.pdf"}');
+            Request request = createRequest('POST', '/');
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.OK));
             Map body = JSON.decode(await response.readAsString());
             expect(body.containsKey('id'), isTrue);
-            expect(body['path'], equals('a/doc.pdf'));
             docId = body['id'];
         });
 
@@ -92,7 +91,6 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
             Map body = JSON.decode(await response.readAsString());
             expect(body['id'], equals(docId));
-            expect(body['path'], equals('a/doc.pdf'));
         });
 
         test('DELETE POST\'ed document', () async {

@@ -3,7 +3,7 @@ import 'package:connection_pool/connection_pool.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'resource_model.dart';
 
-// MongoDB resource model
+/// MongoDB resource model
 class MongoModel extends ResourceModel {
     String collectionName;
     MongoPool _dbPool;
@@ -13,7 +13,7 @@ class MongoModel extends ResourceModel {
         collectionName = collection;
     }
 
-    // Insert a new object into the collection.
+    /// Insert a new object into the collection.
     Future<String> insert(Map data) {
         _checkCollection();
         assert(data['_id'] == null);
@@ -29,7 +29,7 @@ class MongoModel extends ResourceModel {
         });
     }
 
-    // Update an existing item in the collection.
+    /// Update an existing item in the collection.
     Future<bool> update(Map data) {
         _checkCollection();
         String id;
@@ -53,7 +53,7 @@ class MongoModel extends ResourceModel {
         });
     }
 
-    // Query the collection.
+    /// Query the collection.
     Future<List> find(Map query) {
         _checkCollection();
         return _dbPool.getConnection().then((ManagedConnection mc) async {
@@ -64,14 +64,14 @@ class MongoModel extends ResourceModel {
         });
     }
 
-    // Load an item by ID.
+    /// Load an item by ID.
     Future<Map> findById(String id) {
         _checkCollection();
         assert(id != null);
         return find({'_id': id}).then((List items) => items.length > 0 ? items.first : {});
     }
 
-    // Delete based on the provided query.
+    /// Delete based on the provided query.
     Future<bool> delete(Map query) {
         _checkCollection();
         return _dbPool.getConnection().then((ManagedConnection mc) {
@@ -84,13 +84,13 @@ class MongoModel extends ResourceModel {
         });
     }
 
-    // Delete an item by ID.
+    /// Delete an item by ID.
     Future<bool> deleteById(String id) {
         assert(id != null);
         return delete({'_id': id});
     }
 
-    // Delete all objects from a collection.
+    /// Delete all objects from a collection.
     Future<bool> truncate() {
         return delete({});
     }
@@ -102,7 +102,7 @@ class MongoModel extends ResourceModel {
     }
 }
 
-// Mongo connection pool
+/// Mongo connection pool
 class MongoPool extends ConnectionPool<Db> {
     String uri;
     MongoPool(String this.uri, int poolSize) : super(poolSize);
