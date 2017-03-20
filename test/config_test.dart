@@ -4,8 +4,12 @@ import 'package:test/test.dart';
 import '../lib/config.dart';
 
 main() async {
-    Map configMap = await loadConfig('test/config_test.yaml');
-    new Config(configMap);  // initialize the config
+    Map baseConfig = await loadConfig('test/config.yaml');
+    Map testConfig = await loadConfig('test/configs/config_test.yaml');
+    Map allConfig = new Map()
+        ..addAll(baseConfig)
+        ..addAll(testConfig);
+    new Config(allConfig);  // initialize the config
 
     test('get', () {
         expect(Config.get('test_key'), equals('test_value'));

@@ -2,7 +2,7 @@
 .packages
 .pub/
 build/
-config.yaml
-test/config_test.yaml
+/config.yaml
+/test/config.yaml
 pubspec.lock
 doc/api/

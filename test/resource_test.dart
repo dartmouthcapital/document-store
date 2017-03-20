@@ -4,7 +4,7 @@ import '../lib/config.dart';
 import '../lib/db/resource_model.dart';
 
 main() async {
-    Map configMap = await loadConfig('test/config_test.yaml');
+    Map configMap = await loadConfig('test/config.yaml');
     new Config(configMap);  // initialize the config
     if (!Config.get('db_name').contains('test')) {
         throw 'Test DB must contain "test".';

@@ -1,0 +1,4 @@
+# document-store test configuration
+db_name: "documents_test"
+db_uri: "mongodb://127.0.0.1/"
+db_size: 8
