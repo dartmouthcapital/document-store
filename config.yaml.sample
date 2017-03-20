@@ -1,0 +1,4 @@
+# document-store global configuration
+db_name: "documents"
+db_uri: "mongodb://127.0.0.1/"
+db_size: 8
