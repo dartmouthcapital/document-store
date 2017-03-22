@@ -1,7 +1,7 @@
 import 'package:dart_config/default_server.dart';
 import 'package:test/test.dart';
 import '../lib/config.dart';
-import '../lib/db/resource_model.dart';
+import '../lib/db/resource.dart';
 
 main() async {
     Map configMap = await loadConfig('test/config.yaml');

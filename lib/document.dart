@@ -1,40 +1,48 @@
 import 'dart:async';
 import 'dart:convert';
-import 'db/resource_model.dart';
+import 'db/resource.dart';
+import 'mime_type.dart' as mime;
+import 'store/resource.dart';
 
 /// Base Document class
 class Document {
     String collection = 'documents';
     String id;
-    String _path;
     String contentType;
-    String content;
+    List<int> content;
 
-    ResourceModel _resource;
+    AbstractResource _resource;
+    AbstractStore _store;
 
     Document([this.id]);
 
     Document.fromJson(Map json) :
             this.id = json['id'],
-            this._path = json['path'],
             this.contentType = json['content_type'];
 
     Map toMap() => {
         'id': id,
-        'path': _path,
         'content_type': contentType
     };
 
     String toJson() => JSON.encode(toMap());
 
-    String get name => _path.split('/').last;
+    String get name => id + '.' + mime.extension(contentType);
 
     /// Get the resource model for interacting with the DB.
-    ResourceModel resource () {
+    AbstractResource resource() {
         if (_resource == null) {
             _resource = resourceFactory({'collection': collection});
         }
         return _resource;
+    }
+
+    /// Get the storage model for reading and saving files.
+    AbstractStore store() {
+        if (_store == null) {
+            _store = storageFactory();
+        }
+        return _store;
     }
 
     /// Load the document from the file store.
@@ -42,11 +50,10 @@ class Document {
         if (newId != null) {
             id = newId;
         }
-        return resource().findById(id).then((Map data) {
+        return resource().findById(id).then((Map data) async {
             if (data.length > 0) {
-                _path = data['path'];
                 contentType = data['content_type'];
-                return true;
+                return store().ready();
             }
             else {
                 return false;
@@ -54,31 +61,40 @@ class Document {
         });
     }
 
+    Stream<List<int>> streamContent() {
+        return store().read(name);
+    }
+
     /// Save the document to the file store.
-    Future<bool> save() {
+    Future<bool> save() async {
         if (id == null) {
-            return resource().insert(toMap()).then((newId) {
-                if (newId != null) {
-                    id = newId;
-                    return true;
-                }
-                return false;
-            });
+            var newId = await resource().insert(toMap());
+            if (newId != null) {
+                id = newId;
+                await store().ready();
+                return store().write(name, content);
+            }
+            return false;
         }
         else {
-            return resource().update(toMap());
+            await resource().update(toMap());
+            await store().ready();
+            return store().write(name, content);
         }
     }
 
     /// Delete the document from the file store.
     /// Returns true if the document was found and deleted, and false otherwise.
-    Future<bool> delete([String id = null]) {
-        if (id == null) {
-            id = this.id;
-        }
+    Future<bool> delete() async {
         if (id == null) {
             throw 'Cannot delete file without an ID.';
         }
-        return resource().deleteById(id);
+        if (await load()) {
+            if (await store().delete(name)) {
+                return resource().deleteById(id);
+            }
+            throw 'Error deleting document.';
+        }
+        return new Future.value(false);
     }
 }

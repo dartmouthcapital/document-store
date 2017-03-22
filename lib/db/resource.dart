@@ -1,9 +1,9 @@
 import 'dart:async';
 import '../config.dart';
-import 'mongo_model.dart';
+import 'mongo_resource.dart';
 
 /// Base resource model
-abstract class ResourceModel {
+abstract class AbstractResource {
     /// Insert a new object into the store.
     Future<String> insert(Map data);
 
@@ -27,8 +27,8 @@ abstract class ResourceModel {
 }
 
 // The only available resource type, at this point.
-ResourceModel resourceFactory ([Map customParams]) {
-    var resource = new MongoModel(
+AbstractResource resourceFactory([Map customParams]) {
+    var resource = new MongoResource(
         Config.get('db_name'),
         Config.get('db_uri'),
         Config.get('db_size')

@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:connection_pool/connection_pool.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'resource_model.dart';
+import 'resource.dart';
 
 /// MongoDB resource model
-class MongoModel extends ResourceModel {
+class MongoResource extends AbstractResource {
     String collectionName;
     MongoPool _dbPool;
 
-    MongoModel(String databaseName, String databaseUrl, int databasePoolSize, [String collection]) {
+    MongoResource(String databaseName, String databaseUrl, int databasePoolSize, [String collection]) {
         _dbPool = new MongoPool(databaseUrl + databaseName, databasePoolSize);
         collectionName = collection;
     }
