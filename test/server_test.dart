@@ -76,7 +76,6 @@ main() async {
         });
     });
 
-    /*
     group('Testing POST/GET/DELETE cycle', () {
         var docId;
         test('POST new document', () async {
@@ -100,7 +99,7 @@ main() async {
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.OK));
             String body = await response.readAsString();
-            expect(body, equals('text content'));
+            expect(body, equals('test file contents'));
         });
 
         test('DELETE POST\'ed document', () async {
@@ -109,5 +108,4 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
         });
     });
-    */
 }

@@ -13,7 +13,7 @@ class GCloudStore extends AbstractStore {
     static Bucket _bucket;
 
     /// Add a new object to the store
-    Future<bool> write(name, List<int> bytes) async {
+    Future<bool> write(String name, List<int> bytes) async {
         if (name == null) {
             throw new BadRequestException({}, 'Name is required.');
         }
@@ -26,7 +26,7 @@ class GCloudStore extends AbstractStore {
     }
 
     /// Fetch an object from the store
-    Stream<List<int>> read(name) {
+    Stream<List<int>> read(String name) {
         try {
             return _bucket.read(name);
         } catch (e) {
@@ -35,7 +35,7 @@ class GCloudStore extends AbstractStore {
     }
 
     /// Delete an object from the store
-    Future<bool> delete(name) async {
+    Future<bool> delete(String name) async {
         try {
             await _bucket.delete(name);
             return true;

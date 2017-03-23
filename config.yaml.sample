@@ -2,3 +2,10 @@
 db_name: "documents"
 db_uri: "mongodb://127.0.0.1/"
 db_size: 8
+storage_adapter: "gcloud"
+
+gcloud:
+  project: "my-project"
+  bucket: "my-bucket"
+  service_account: >-
+    { ... }
