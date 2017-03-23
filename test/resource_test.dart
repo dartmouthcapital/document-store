@@ -1,15 +1,9 @@
-import 'package:dart_config/default_server.dart';
 import 'package:test/test.dart';
-import '../lib/config.dart';
 import '../lib/db/resource.dart';
+import 'helper.dart';
 
 main() async {
-    Map configMap = await loadConfig('test/config.yaml');
-    new Config(configMap);  // initialize the config
-    if (!Config.get('db_name').contains('test')) {
-        throw 'Test DB must contain "test".';
-    }
-
+    await initTestConfig();
     var resource = resourceFactory({'collection': 'test'}),
         id;
 

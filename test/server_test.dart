@@ -1,21 +1,14 @@
 import 'dart:convert';
 import 'dart:io' show HttpStatus;
 
-import 'package:dart_config/default_server.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
 import 'package:test/test.dart';
-
-import '../lib/config.dart';
 import '../lib/router.dart' as app;
+import 'helper.dart';
 
 main() async {
-    Map configMap = await loadConfig('test/config.yaml');
-    new Config(configMap); // initialize the config
-    if (!Config.get('db_name').contains('test')) {
-        throw 'Test DB must contain "test".';
-    }
-
+    await initTestConfig();
     Handler handler = const Pipeline()
         .addMiddleware(exceptionHandler())
         .addMiddleware(app.appMw)

@@ -6,33 +6,40 @@ import 'store/resource.dart';
 
 /// Base Document class
 class Document {
-    String collection = 'documents';
-    String id;
+    String _collection = 'documents';
+    String _id;
     String contentType;
     List<int> content;
 
     AbstractResource _resource;
     AbstractStore _store;
 
-    Document([this.id]);
+    Document([this._id]);
 
     Document.fromJson(Map json) :
-            this.id = json['id'],
+            this._id = json['id'],
             this.contentType = json['content_type'];
 
     Map toMap() => {
-        'id': id,
+        'id': _id,
         'content_type': contentType
     };
 
     String toJson() => JSON.encode(toMap());
 
-    String get name => id + '.' + mime.extension(contentType);
+    String get id => _id;
+    String get name {
+        String ext = mime.extension(contentType);
+        if (ext == null) {
+            throw new Exception();// 'Could not determine file extension from content type.';
+        }
+        return _id + '.' + ext;
+    }
 
     /// Get the resource model for interacting with the DB.
     AbstractResource resource() {
         if (_resource == null) {
-            _resource = resourceFactory({'collection': collection});
+            _resource = resourceFactory({'collection': _collection});
         }
         return _resource;
     }
@@ -46,11 +53,11 @@ class Document {
     }
 
     /// Load the document from the file store.
-    Future<bool> load([String newId = null]) {
-        if (newId != null) {
-            id = newId;
+    Future<bool> load([String id = null]) {
+        if (id != null) {
+            _id = id;
         }
-        return resource().findById(id).then((Map data) async {
+        return resource().findById(_id).then((Map data) async {
             if (data.length > 0) {
                 contentType = data['content_type'];
                 return store().ready();
@@ -67,10 +74,13 @@ class Document {
 
     /// Save the document to the file store.
     Future<bool> save() async {
-        if (id == null) {
+        if (content == null) {
+            throw 'Document content has not been set.';
+        }
+        if (_id == null) {
             var newId = await resource().insert(toMap());
             if (newId != null) {
-                id = newId;
+                _id = newId;
                 await store().ready();
                 return store().write(name, content);
             }
@@ -86,12 +96,12 @@ class Document {
     /// Delete the document from the file store.
     /// Returns true if the document was found and deleted, and false otherwise.
     Future<bool> delete() async {
-        if (id == null) {
+        if (_id == null) {
             throw 'Cannot delete file without an ID.';
         }
         if (await load()) {
             if (await store().delete(name)) {
-                return resource().deleteById(id);
+                return resource().deleteById(_id);
             }
             throw 'Error deleting document.';
         }

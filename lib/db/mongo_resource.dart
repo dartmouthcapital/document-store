@@ -95,7 +95,7 @@ class MongoResource extends AbstractResource {
         return delete({});
     }
 
-    void _checkCollection () {
+    void _checkCollection() {
         if (collectionName == null) {
             throw 'Collection name must be specified.';
         }
@@ -107,12 +107,12 @@ class MongoPool extends ConnectionPool<Db> {
     String uri;
     MongoPool(String this.uri, int poolSize) : super(poolSize);
 
-    Future<Db> openNewConnection () {
+    Future<Db> openNewConnection() {
         var conn = new Db(uri);
         return conn.open().then((_) => conn);
     }
 
-    void closeConnection (Db conn) {
+    void closeConnection(Db conn) {
         conn.close();
     }
 }
