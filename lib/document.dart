@@ -31,7 +31,7 @@ class Document {
     String get name {
         String ext = mime.extension(contentType);
         if (ext == null) {
-            throw new Exception();// 'Could not determine file extension from content type.';
+            throw new Exception('Could not determine file extension from content type.');
         }
         return _id + '.' + ext;
     }

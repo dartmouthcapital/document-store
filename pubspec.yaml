@@ -13,9 +13,10 @@ dependencies:
   gcloud:
   googleapis_auth:
   logging:
+  logging_handlers:
   mongo_dart:
-  shelf_route:
   shelf_exception_handler:
+  shelf_route:
 
 dev_dependencies:
   test:

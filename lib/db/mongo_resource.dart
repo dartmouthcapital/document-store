@@ -4,7 +4,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'resource.dart';
 
 /// MongoDB resource model
-class MongoResource extends AbstractResource {
+class MongoResource implements AbstractResource {
     String collectionName;
     MongoPool _dbPool;
 

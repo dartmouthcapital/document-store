@@ -8,7 +8,7 @@ import '../config.dart';
 /// Google Cloud storage class
 ///
 /// See https://github.com/dart-lang/gcloud
-class GCloudStore extends AbstractStore {
+class GCloudStore implements AbstractStore {
     static Storage _storage;
     static Bucket _bucket;
 
@@ -27,11 +27,9 @@ class GCloudStore extends AbstractStore {
 
     /// Fetch an object from the store
     Stream<List<int>> read(String name) {
-        try {
-            return _bucket.read(name);
-        } catch (e) {
+        return _bucket.read(name).handleError((e) {
             throw _handleException(e);
-        }
+        });
     }
 
     /// Delete an object from the store

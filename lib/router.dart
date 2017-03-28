@@ -10,7 +10,11 @@ Router appRouter = router()
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
         if (await doc.load()) {
-            return new Response.ok(doc.streamContent(), headers: {'content-type': doc.contentType});
+            List<int> content = [];
+            await for (var bytes in doc.streamContent()) {
+                content.addAll(bytes);
+            }
+            return new Response.ok(content, headers: {'content-type': doc.contentType});
         }
         throw new NotFoundException();
     })

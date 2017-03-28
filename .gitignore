@@ -6,3 +6,4 @@ build/
 /test/config.yaml
 pubspec.lock
 doc/api/
+/var
