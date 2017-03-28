@@ -12,6 +12,7 @@ dependencies:
   dart_config:
   gcloud:
   googleapis_auth:
+  image:
   logging:
   logging_handlers:
   mongo_dart:

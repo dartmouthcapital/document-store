@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:image/image.dart';
 import 'package:test/test.dart';
+import '../lib/config.dart';
 import '../lib/document.dart';
 import '../lib/db/resource.dart';
 import '../lib/store/resource.dart';
@@ -88,5 +91,31 @@ main() async {
 
         doc = new Document();
         expect(doc.delete(), throwsA(equals('Cannot delete file without an ID.')));
+    });
+
+    test('Images are correctly resized.', () async {
+        //Config.set('storage/resize_max_width', 500);
+
+        // small image, don't resize
+        var imageData = new File('test/documents/test_x300.jpg').readAsBytesSync();
+        Document doc = new Document()
+            ..content = imageData
+            ..contentType = 'image/jpeg';
+
+        await doc.save();
+        Image image = decodeImage(doc.content);
+        expect(image, isNotNull);
+        expect(image.width, equals(300));
+
+        // large image, resize
+        imageData = new File('test/documents/test_x768.jpg').readAsBytesSync();
+        doc = new Document()
+            ..content = imageData
+            ..contentType = 'image/jpeg';
+
+        await doc.save();
+        image = decodeImage(doc.content);
+        expect(image, isNotNull);
+        expect(image.width, equals(500));
     });
 }

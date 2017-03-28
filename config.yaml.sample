@@ -2,7 +2,9 @@
 db_name: "documents"
 db_uri: "mongodb://127.0.0.1/"
 db_size: 8
-storage_adapter: "gcloud"
+storage:
+  adapter: "gcloud"
+  resize_max_width: 900
 
 gcloud:
   project: "my-project"

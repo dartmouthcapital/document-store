@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:image/image.dart';
+import 'config.dart';
 import 'db/resource.dart';
 import 'mime_type.dart' as mime;
 import 'store/resource.dart';
@@ -77,19 +79,20 @@ class Document {
         if (content == null) {
             throw 'Document content has not been set.';
         }
+        _resizeImage();
         if (_id == null) {
             var newId = await resource().insert(toMap());
             if (newId != null) {
                 _id = newId;
                 await store().ready();
-                return store().write(name, content);
+                return store().write(name, content, contentType: contentType);
             }
             return false;
         }
         else {
             await resource().update(toMap());
             await store().ready();
-            return store().write(name, content);
+            return store().write(name, content, contentType: contentType);
         }
     }
 
@@ -106,5 +109,38 @@ class Document {
             throw 'Error deleting document.';
         }
         return new Future.value(false);
+    }
+
+    bool _canResize () {
+        switch (contentType) {
+            case 'image/png':
+            case 'image/jpeg':
+            case 'image/gif':
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    void _resizeImage () {
+        var maxWidth = Config.get('storage/resize_max_width');
+        if (_canResize() && maxWidth is int && maxWidth > 0) {
+            Image original = decodeImage(content);
+            if (original != null && original.width > maxWidth) {
+                Image resized = copyResize(original, maxWidth);
+                switch (contentType) {
+                    case 'image/png':
+                        content = encodePng(resized);
+                        break;
+                    case 'image/jpeg':
+                        content = encodeJpg(resized, quality: 90);
+                        break;
+                    case 'image/gif':
+                        content = encodeGif(resized);
+                        break;
+                    // no further action by default
+                }
+            }
+        }
     }
 }

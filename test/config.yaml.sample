@@ -2,4 +2,6 @@
 db_name: "documents_test"
 db_uri: "mongodb://127.0.0.1/"
 db_size: 8
-storage_adapter: "test"
+storage:
+  adapter: "test"
+  resize_max_width: 500

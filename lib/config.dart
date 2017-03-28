@@ -1,7 +1,7 @@
 /// Singleton config class
 class Config {
     static Config _singleton;
-    Map config;
+    Map _config;
 
     factory Config([Map config = null]) {
         if (_singleton == null) {
@@ -13,14 +13,14 @@ class Config {
         return _singleton;
     }
 
-    Config._internal(this.config);
+    Config._internal(this._config);
 
     /// Get a field from the config.
     static get(String key) {
         var parts = key.split('/'),
             last = parts.removeLast(),
             instance = new Config(),
-            map = instance.config;
+            map = instance._config;
 
         for (var part in parts) {
             if (map.containsKey(part)) {
@@ -41,7 +41,7 @@ class Config {
         var parts = key.split('/'),
             last = parts.removeLast(),
             instance = new Config(),
-            map = instance.config;
+            map = instance._config;
 
         for (var part in parts) {
             if (!map.containsKey(part)) {

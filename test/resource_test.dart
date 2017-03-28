@@ -41,4 +41,16 @@ main() async {
         var item = await resource.findById(id);
         expect(item.length, equals(0));
     });
+
+    test('Collection was truncated.', () async {
+        Map newItem = {
+            'foo': 'bar',
+            'hello': 'world'
+        };
+        id = await resource.insert(newItem);
+        var result = await resource.truncate();
+        expect(result, isTrue);
+        var items = await resource.find({});
+        expect(items.length, equals(0));
+    });
 }

@@ -13,12 +13,12 @@ class GCloudStore implements AbstractStore {
     static Bucket _bucket;
 
     /// Add a new object to the store
-    Future<bool> write(String name, List<int> bytes) async {
+    Future<bool> write(String name, List<int> bytes, {String contentType}) async {
         if (name == null) {
             throw new BadRequestException({}, 'Name is required.');
         }
         try {
-            await _bucket.writeBytes(name, bytes);
+            await _bucket.writeBytes(name, bytes, contentType: contentType);
             return true;
         } catch (e) {
             throw _handleException(e);

@@ -10,7 +10,7 @@ abstract class AbstractStore {
     Stream<List<int>> read(String name);
 
     /// Add a new object to the store
-    Future<bool> write(String name, List<int> bytes);
+    Future<bool> write(String name, List<int> bytes, {String contentType});
 
     /// Delete an object from the store
     Future<bool> delete(String name);
@@ -21,7 +21,7 @@ abstract class AbstractStore {
 
 // Instantiate a new storage factory.
 AbstractStore storageFactory() {
-    String adapter = Config.get('storage_adapter');
+    String adapter = Config.get('storage/adapter');
     switch (adapter) {
         case 'test':
             return new TestStore();
@@ -32,7 +32,7 @@ AbstractStore storageFactory() {
 }
 
 /// Test storage adapter
-class TestStore extends AbstractStore {
+class TestStore implements AbstractStore {
     /// Fetch an object from the store
     /// Pass a name containing 'fail' for a negative result.
     /// Otherwise, a stream of 'test file contents' is returned.
@@ -49,7 +49,7 @@ class TestStore extends AbstractStore {
     }
 
     /// Add a new object to the store
-    Future<bool> write(String name, List<int> bytes) {
+    Future<bool> write(String name, List<int> bytes, {String contentType}) {
         if (name.contains('fail')) {
             return new Future.value(false);
         }
