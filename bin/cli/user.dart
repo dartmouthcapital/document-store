@@ -9,6 +9,7 @@ class UserCommand extends Command {
 
     UserCommand() {
         addSubcommand(new InfoCommand());
+        addSubcommand(new EditCommand());
         addSubcommand(new RegisterCommand());
         addSubcommand(new DeleteCommand());
     }
@@ -20,8 +21,9 @@ class InfoCommand extends Command {
     final String description = 'View User details.';
 
     InfoCommand() {
-        argParser.addOption('id', abbr: 'i', help: 'ID of User to query.');
-        argParser.addOption('username', abbr: 'u', help: 'Username of User to query.');
+        argParser
+            ..addOption('id', abbr: 'i', help: 'ID of User to query.')
+            ..addOption('username', abbr: 'u', help: 'Username of User to query.');
     }
 
     run() async {
@@ -36,6 +38,53 @@ class InfoCommand extends Command {
         var identifier = id != null ? id : username;
         User user = new User();
         if (await user.load(identifier, id != null ? 'id' : 'username')) {
+            print(user.toJson().toString());
+            exit(0);
+        }
+        else {
+            print('User "$identifier" does not exist.');
+            exit(1);
+        }
+    }
+}
+
+/// Command to edit user details.
+class EditCommand extends Command {
+    final String name = 'edit';
+    final String description = 'Edit User details.';
+
+    EditCommand() {
+        argParser
+            ..addOption('id', abbr: 'i', help: 'ID of User to edit.')
+            ..addOption('username', abbr: 'u', help: 'Username of User to edit.')
+            ..addOption('new_username', abbr: 'n', help: 'New username for User.')
+            ..addFlag('enable', abbr: 'e', help: 'Enable the User.')
+            ..addFlag('disable', abbr: 'd', help: 'Disable the User.');
+    }
+
+    run() async {
+        var id = argResults['id'],
+            username = argResults['username'];
+        if (id == null && username == null) {
+            throw new UsageException(
+                '"id" or "username" must be set.',
+                'edit [-i "123456" -u "testUser"]'
+            );
+        }
+        var identifier = id != null ? id : username;
+        User user = new User();
+        if (await user.load(identifier, id != null ? 'id' : 'username')) {
+            var newUsername = argResults['new_username'];
+            if (newUsername != null) {
+                user.username = newUsername;
+            }
+            if (argResults['enable']) {
+                user.isActive = true;
+            }
+            else if (argResults['disable']) {
+                user.isActive = false;
+            }
+            await user.save();
             print(user.toJson().toString());
             exit(0);
         }

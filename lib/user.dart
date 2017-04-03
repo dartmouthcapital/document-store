@@ -8,14 +8,19 @@ class User extends Model {
     String username;
     String password;
     String passwordHash;
+    bool isActive;
 
     User([this._id]);
 
     /// Prepare the model for saving in the DB.
     Map toMap() {
+        if (isActive == null) {
+            isActive = true;
+        }
         Map data = {
             'id': _id,
-            'username': username
+            'username': username,
+            'is_active': isActive
         };
         if (password != null) {
             passwordHash = new DBCrypt().hashpw(password, new DBCrypt().gensalt());
@@ -34,6 +39,9 @@ class User extends Model {
         if (map.containsKey('password_hash')) {
             passwordHash = map['password_hash'];
         }
+        if (map.containsKey('is_active')) {
+            isActive = map['is_active'];
+        }
     }
 
     String get collection => 'users';
@@ -42,17 +50,21 @@ class User extends Model {
 
     /// Create a new user by username and password, and return its ID.
     Future<String> register (String username, String password) async {
-        User user = new User()
-            ..username = username
-            ..password = password;
-        if (await user.save()) {
-            return user.id;
+        this.username = username;
+        this.password = password;
+        if (await save()) {
+            return id;
         }
         throw new Exception('Unable to register user.');
     }
 
-    Future<bool> loadByUsername (String username) {
-        return load(username, 'username');
+    Future<bool> loadByUsername (String username, [bool requireActive = false]) async {
+        if (await load(username, 'username')) {
+            if (!requireActive || (requireActive == true && isActive)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     Future<bool> deleteByUsername (String username) {
@@ -61,7 +73,7 @@ class User extends Model {
 
     /// Load and authenticate the user by username and password.
     Future<bool> authenticate (String username, String password) async {
-        if (await loadByUsername(username)) {
+        if (await loadByUsername(username, true)) {
             return new DBCrypt().checkpw(password, passwordHash);
         }
         return new Future.value(false);

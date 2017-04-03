@@ -4,6 +4,7 @@ import 'helper.dart';
 
 main() async {
     await initTestConfig();
+    await new User()..resource().truncate();
 
     test('Constructors, getters and setters.', () {
         var user = new User('abcdef');
@@ -12,7 +13,8 @@ main() async {
         Map data = {
             'id': 'bogus',
             'username': 'test_user',
-            'password_hash': 'hash12345790'
+            'password_hash': 'hash12345790',
+            'is_active': true
         };
         user.fromMap(data);
         expect(user.id, isNot('bogus'));
@@ -24,9 +26,11 @@ main() async {
         // save
         var user = new User()
             ..username = 'test_user'
-            ..passwordHash = 'hash12345790';
+            ..passwordHash = 'hash12345790'
+            ..isActive = false;
         var saveResult = await user.save();
         expect(saveResult, isTrue);
+        expect(user.isActive, isFalse);
         var newId = user.id;
 
         // load
@@ -46,6 +50,7 @@ main() async {
         User user = new User();
         String id = await user.register(username, 'secret');
         expect(id, isNotNull);
+        expect(user.isActive, isTrue);
         bool res = await user.load(id);
         expect(res, isTrue);
     });
@@ -79,5 +84,8 @@ main() async {
         expect(await user.authenticate(username, 'secret'), isTrue);
         expect(await user.authenticate(username, 'badpw'), isFalse);
         expect(await user.authenticate('bad_user', 'secret'), isFalse);
+        user..isActive = false
+            ..save();
+        expect(await user.authenticate(username, 'secret'), isFalse);  // not active
     });
 }
