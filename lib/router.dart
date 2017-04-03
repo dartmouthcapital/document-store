@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:http_exception/http_exception.dart';
+import 'package:option/option.dart';
 import 'package:shelf/shelf.dart';
+import 'package:shelf_auth/shelf_auth.dart';
 import 'package:shelf_route/shelf_route.dart';
 import 'document.dart';
+import 'user.dart';
 
-Router appRouter = router()
+Router appRouter = router(middleware: _authMw)
     ..get('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
@@ -39,25 +43,41 @@ Router appRouter = router()
             return new Response.ok('Document deleted.');
         }
         throw new NotFoundException();
+    })
+    ..add('/', ['OPTIONS'], (Request request) {
+        return new Response.ok(null, headers: CORSHeader);
     });
 
-Middleware appMw = createMiddleware(
-    requestHandler: reqHandler,
-    responseHandler: respHandler
+Middleware _authMw = authenticate(
+    [new BasicAuthenticator(_appAuth)],
+    allowAnonymousAccess: false,
+    allowHttp: true
 );
 
-Response reqHandler(Request request) {
-    if (request.method == 'OPTIONS') {
-        return new Response.ok(null, headers: CORSHeader);
+Future<Option<Principal>> _appAuth(String username, String password) async {
+    User user = new User();
+    if (await user.authenticate(username, password)) {
+        return new Some(new Principal(username));
     }
-    List allowed = ['GET', 'POST', 'DELETE'];
+    else {
+        return const None();
+    }
+}
+
+Middleware appMiddleware = createMiddleware(
+    requestHandler: _reqHandler,
+    responseHandler: _respHandler
+);
+
+Response _reqHandler(Request request) {
+    List allowed = ['GET', 'POST', 'DELETE', 'OPTIONS'];
     if (!allowed.contains(request.method)) {
         throw new MethodNotAllowed();
     }
     return null;
 }
 
-Response respHandler(Response response) {
+Response _respHandler(Response response) {
     return response.change(headers: CORSHeader);
 }
 

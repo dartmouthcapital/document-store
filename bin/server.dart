@@ -21,7 +21,7 @@ main(List<String> args) async {
             logHandler.call(record);
         }))
         .addMiddleware(logRequests())
-        .addMiddleware(app.appMw)
+        .addMiddleware(app.appMiddleware)
         .addHandler(app.appRouter.handler);
 
     printRoutes(app.appRouter);

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:connection_pool/connection_pool.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'resource.dart';
+import '../resource.dart';
 
 /// MongoDB resource model
 class MongoResource implements AbstractResource {
@@ -59,6 +59,7 @@ class MongoResource implements AbstractResource {
         return _dbPool.getConnection().then((ManagedConnection mc) async {
             DbCollection collection = new DbCollection(mc.conn, collectionName);
             List<Map> list = await collection.find(query).toList();
+            _standardize(list);
             _dbPool.releaseConnection(mc);
             return list;
         });
@@ -68,7 +69,13 @@ class MongoResource implements AbstractResource {
     Future<Map> findById(String id) {
         _checkCollection();
         assert(id != null);
-        return find({'_id': id}).then((List items) => items.length > 0 ? items.first : {});
+        return find({'_id': id}).then((List items) {
+            if (items.length > 0) {
+                _standardize(items);
+                return items.first;
+            }
+            return {};
+        });
     }
 
     /// Delete based on the provided query.
@@ -98,6 +105,16 @@ class MongoResource implements AbstractResource {
     void _checkCollection() {
         if (collectionName == null) {
             throw 'Collection name must be specified.';
+        }
+    }
+
+    /// Convert the internal _id field to a non-underscored field.
+    void _standardize(List<Map> items) {
+        for (Map item in items) {
+            if (item.containsKey('_id')) {
+                item['id'] = item['_id'];
+                item.remove('_id');
+            }
         }
     }
 }

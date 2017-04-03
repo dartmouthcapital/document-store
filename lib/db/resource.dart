@@ -1,6 +1,6 @@
 import 'dart:async';
 import '../config.dart';
-import 'mongo_resource.dart';
+import 'resource/mongo.dart';
 
 /// Base resource model
 abstract class AbstractResource {

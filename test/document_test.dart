@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
-import '../lib/config.dart';
 import '../lib/document.dart';
 import '../lib/db/resource.dart';
 import '../lib/store/resource.dart';
@@ -14,6 +13,8 @@ main() async {
     test('Constructors, getters and setters.', () {
         var doc = new Document('abcdef');
         expect(doc.id, equals('abcdef'));
+        doc.id = 'fedcba';
+        expect(doc.id, equals('fedcba'));
 
         Map json = {
             'id': 'abcdef',

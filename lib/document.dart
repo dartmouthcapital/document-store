@@ -1,19 +1,18 @@
+library document_store;
+
 import 'dart:async';
-import 'dart:convert';
 import 'package:image/image.dart';
 import 'config.dart';
-import 'db/resource.dart';
+import 'db/model.dart';
 import 'mime_type.dart' as mime;
 import 'store/resource.dart';
 
 /// Base Document class
-class Document {
-    String _collection = 'documents';
+class Document extends Model {
     String _id;
     String contentType;
     List<int> content;
 
-    AbstractResource _resource;
     AbstractStore _store;
 
     Document([this._id]);
@@ -22,28 +21,29 @@ class Document {
             this._id = json['id'],
             this.contentType = json['content_type'];
 
+    /// Prepare the model for saving in the DB.
     Map toMap() => {
         'id': _id,
         'content_type': contentType
     };
 
-    String toJson() => JSON.encode(toMap());
+    /// Populate the model with data from the DB.
+    void fromMap(Map map) {
+        if (map.containsKey('content_type')) {
+            contentType = map['content_type'];
+        }
+    }
 
+    String get collection => 'documents';
     String get id => _id;
+    set id (String newId) => _id = newId;
+
     String get name {
         String ext = mime.extension(contentType);
         if (ext == null) {
             throw new Exception('Could not determine file extension from content type.');
         }
         return _id + '.' + ext;
-    }
-
-    /// Get the resource model for interacting with the DB.
-    AbstractResource resource() {
-        if (_resource == null) {
-            _resource = resourceFactory({'collection': _collection});
-        }
-        return _resource;
     }
 
     /// Get the storage model for reading and saving files.
@@ -55,19 +55,14 @@ class Document {
     }
 
     /// Load the document from the file store.
-    Future<bool> load([String id = null]) {
-        if (id != null) {
-            _id = id;
+    Future<bool> load([String id = null, String field = 'id']) async {
+        if (field != 'id') {
+            throw 'Loading by a field other than ID is not supported.';
         }
-        return resource().findById(_id).then((Map data) async {
-            if (data.length > 0) {
-                contentType = data['content_type'];
-                return store().ready();
-            }
-            else {
-                return false;
-            }
-        });
+        if (await super.load(id, field)) {
+            return store().ready();
+        }
+        return new Future.value(false);
     }
 
     Stream<List<int>> streamContent() {
@@ -80,20 +75,9 @@ class Document {
             throw 'Document content has not been set.';
         }
         _resizeImage();
-        if (_id == null) {
-            var newId = await resource().insert(toMap());
-            if (newId != null) {
-                _id = newId;
-                await store().ready();
-                return store().write(name, content, contentType: contentType);
-            }
-            return false;
-        }
-        else {
-            await resource().update(toMap());
-            await store().ready();
-            return store().write(name, content, contentType: contentType);
-        }
+        await super.save();
+        await store().ready();
+        return store().write(name, content, contentType: contentType);
     }
 
     /// Delete the document from the file store.
@@ -104,7 +88,7 @@ class Document {
         }
         if (await load()) {
             if (await store().delete(name)) {
-                return resource().deleteById(_id);
+                return super.delete();
             }
             throw 'Error deleting document.';
         }

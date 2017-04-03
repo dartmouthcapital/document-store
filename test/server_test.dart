@@ -5,16 +5,34 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
 import 'package:test/test.dart';
 import '../lib/router.dart' as app;
+import '../lib/user.dart';
 import 'helper.dart';
 
 main() async {
     await initTestConfig();
     Handler handler = const Pipeline()
         .addMiddleware(exceptionHandler())
-        .addMiddleware(app.appMw)
+        .addMiddleware(app.appMiddleware)
         .addHandler(app.appRouter.handler);
 
+    const String username = 'tester';
+    const String password = 'secret';
+    User tester = new User();
+    if (await tester.loadByUsername(username) == false) {
+        tester
+            ..username = username
+            ..password = password
+            ..save();
+    }
+
     Request createRequest(String method, String path, {String body: '', Map headers: null}) {
+        if (headers == null) {
+            headers = {};
+        }
+        if (!headers.containsKey('Authorization')) {
+            headers['Authorization'] =
+                'Basic ' + BASE64.encode(UTF8.encode(username + ':' + password));
+        }
         return new Request(
             method,
             Uri.parse('http://localhost:9999${path}'),
@@ -22,6 +40,27 @@ main() async {
             headers: headers
         );
     }
+
+    group('Testing authentication and OPTIONS', () {
+        test('OPTIONS / 200', () async {
+            Request request = createRequest('OPTIONS', '/');
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+        });
+
+        test('OPTIONS / 400', () async {
+            Request request = createRequest('OPTIONS', '/', headers: {'Authorization': 'badauth'});
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.BAD_REQUEST));
+        });
+
+        test('OPTIONS / 401', () async {
+            String auth = 'Basic ' + BASE64.encode(UTF8.encode('test:nevermatch'));
+            Request request = createRequest('OPTIONS', '/', headers: {'Authorization': auth});
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
+        });
+    });
 
     group('Testing 404 routes', () {
         test('GET /bad/route', () async {
@@ -82,6 +121,7 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
             Map body = JSON.decode(await response.readAsString());
             expect(body.containsKey('id'), isTrue);
+            expect(body['id'], isNotNull);
             expect(body.containsKey('content_type'), isTrue);
             expect(body['content_type'], equals('text/plain'));
             docId = body['id'];
