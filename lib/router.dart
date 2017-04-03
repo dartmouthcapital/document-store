@@ -24,6 +24,9 @@ Router appRouter = router(middleware: _authMw)
     ..post('/', (Request request) async {
         var bin = new BytesBuilder(),
             contentType = request.mimeType;
+        if (contentType == null || contentType.isEmpty) {
+            throw new BadRequestException(null, 'Content-type header must be set.');
+        }
         await for (var bytes in request.read()) {
             bin.add(bytes);
         }
