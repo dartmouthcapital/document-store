@@ -3,7 +3,7 @@ import '../config.dart';
 import 'resource/mongo.dart';
 
 /// Base resource model
-abstract class AbstractResource {
+abstract class DbResource {
     /// Insert a new object into the store.
     Future<String> insert(Map data);
 
@@ -27,7 +27,7 @@ abstract class AbstractResource {
 }
 
 // The only available resource type, at this point.
-AbstractResource resourceFactory([Map customParams]) {
+DbResource resourceFactory([Map customParams]) {
     var resource = new MongoResource(
         Config.get('db_name'),
         Config.get('db_uri'),

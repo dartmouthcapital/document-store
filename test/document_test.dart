@@ -25,8 +25,8 @@ main() async {
         expect(doc.toJson(), equals(JSON.encode(json)));
         expect(doc.name, equals('abcdef.txt'));
 
-        expect(doc.resource() is AbstractResource, isTrue);
-        expect(doc.store() is AbstractStore, isTrue);
+        expect(doc.resource() is DbResource, isTrue);
+        expect(doc.store() is StoreResource, isTrue);
 
         doc.contentType = 'bogus';
         try {

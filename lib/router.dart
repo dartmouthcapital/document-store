@@ -37,7 +37,7 @@ Router appRouter = router(middleware: _authMw)
         if (await doc.save()) {
             return new Response.ok(doc.toJson(), headers: {'content-type': 'application/json'});
         }
-        throw new HttpException();
+        throw new HttpException(); // ignore: conflicting_dart_import
     })
     ..delete('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');

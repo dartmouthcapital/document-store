@@ -6,7 +6,7 @@ import 'resource.dart';
 
 /// Abstract model for interacting with the DB.
 abstract class Model {
-    AbstractResource _resource;
+    DbResource _resource;
 
     /// Collection/table for interacting with the DB.
     String get collection;
@@ -16,7 +16,7 @@ abstract class Model {
     set id (String newId);
 
     /// Get the resource model for interacting with the DB.
-    AbstractResource resource() {
+    DbResource resource() {
         if (_resource == null) {
             _resource = resourceFactory({'collection': collection});
         }

@@ -13,7 +13,7 @@ class Document extends Model {
     String contentType;
     List<int> content;
 
-    AbstractStore _store;
+    StoreResource _store;
 
     Document([this._id]);
 
@@ -47,7 +47,7 @@ class Document extends Model {
     }
 
     /// Get the storage model for reading and saving files.
-    AbstractStore store() {
+    StoreResource store() {
         if (_store == null) {
             _store = storageFactory();
         }

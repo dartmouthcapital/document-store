@@ -5,7 +5,7 @@ import 'gcloud.dart';
 import '../config.dart';
 
 /// Abstract file store
-abstract class AbstractStore {
+abstract class StoreResource {
     /// Fetch an object from the store
     Stream<List<int>> read(String name);
 
@@ -20,19 +20,19 @@ abstract class AbstractStore {
 }
 
 // Instantiate a new storage factory.
-AbstractStore storageFactory() {
+StoreResource storageFactory() {
     String adapter = Config.get('storage/adapter');
     switch (adapter) {
         case 'test':
             return new TestStore();
         case 'gcloud':
         default:
-            return new GCloudStore();
+            return new GCloudStore(); // ignore: return_of_invalid_type
     }
 }
 
 /// Test storage adapter
-class TestStore implements AbstractStore {
+class TestStore implements StoreResource {
     /// Fetch an object from the store
     /// Pass a name containing 'fail' for a negative result.
     /// Otherwise, a stream of 'test file contents' is returned.

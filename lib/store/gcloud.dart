@@ -8,7 +8,7 @@ import '../config.dart';
 /// Google Cloud storage class
 ///
 /// See https://github.com/dart-lang/gcloud
-class GCloudStore implements AbstractStore {
+class GCloudStore implements StoreResource {
     static Storage _storage;
     static Bucket _bucket;
 
