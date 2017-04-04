@@ -52,6 +52,7 @@ class User extends Model {
     Future<String> register (String username, String password) async {
         this.username = username;
         this.password = password;
+        isActive = true;
         if (await save()) {
             return id;
         }
@@ -60,6 +61,9 @@ class User extends Model {
 
     Future<bool> loadByUsername (String username, [bool requireActive = false]) async {
         if (await load(username, 'username')) {
+            if (isActive == null) {
+                isActive = false;
+            }
             if (!requireActive || (requireActive == true && isActive)) {
                 return true;
             }

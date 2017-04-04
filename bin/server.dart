@@ -1,4 +1,3 @@
-import 'package:dart_config/default_server.dart';
 import 'package:logging/logging.dart';
 import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:shelf/shelf.dart';
@@ -10,8 +9,7 @@ import '../lib/config.dart';
 import '../lib/router.dart' as app;
 
 main(List<String> args) async {
-    Map configMap = await loadConfig();
-    new Config(configMap);  // initialize the config
+    await Config.ready();
     var logHandler = new SyncFileLoggingHandler('var/request.log');
 
     Handler handler = const Pipeline()

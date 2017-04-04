@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:dart_config/default_server.dart';
+
 /// Singleton config class
 class Config {
     static Config _singleton;
@@ -14,6 +17,12 @@ class Config {
     }
 
     Config._internal(this._config);
+
+    /// Initialize the config.
+    static Future ready([String configFile = 'config.yaml']) async {
+        Map configMap = await loadConfig(configFile);
+        new Config(configMap);  // initialize the config
+    }
 
     /// Get a field from the config.
     static get(String key) {

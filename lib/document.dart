@@ -82,7 +82,10 @@ class Document extends Model {
 
     /// Delete the document from the file store.
     /// Returns true if the document was found and deleted, and false otherwise.
-    Future<bool> delete() async {
+    Future<bool> delete([String id = null, String field = 'id']) async {
+        if (field != 'id') {
+            throw 'Document deletion must only be by ID.';
+        }
         if (_id == null) {
             throw 'Cannot delete file without an ID.';
         }
