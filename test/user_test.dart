@@ -6,7 +6,7 @@ main() async {
     await initTestConfig();
     await new User()..resource().truncate();
 
-    test('Constructors, getters and setters.', () {
+    test('Constructors, getters and setters', () {
         var user = new User('abcdef');
         expect(user.id, equals('abcdef'));
 
@@ -22,7 +22,7 @@ main() async {
         expect(user.toMap(), equals(data));
     });
 
-    test('Save, load and delete cycle.', () async {
+    test('Save, load and delete cycle', () async {
         // save
         var user = new User()
             ..username = 'test_user'
@@ -70,7 +70,7 @@ main() async {
         expect(res, isTrue);
     });
 
-    test('Password hashing and authentication.', () async {
+    test('Password hashing and authentication', () async {
         String username = 'auth_user';
         User user = new User();
         await user.deleteByUsername(username);

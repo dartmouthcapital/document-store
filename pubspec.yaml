@@ -10,10 +10,12 @@ environment:
 dependencies:
   args:
   connection_pool:
+  crypto:
   dart_config:
   dbcrypt:
   gcloud:
   googleapis_auth:
+  http:
   image:
   logging:
   logging_handlers:

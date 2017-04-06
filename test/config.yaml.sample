@@ -5,3 +5,4 @@ db_size: 8
 storage:
   adapter: "test"
   resize_max_width: 500
+  encrypt: true

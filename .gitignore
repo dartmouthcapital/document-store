@@ -1,6 +1,7 @@
 .idea/
 .packages
 .pub/
+bin/test.dart
 build/
 /config.yaml
 /test/config.yaml

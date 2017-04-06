@@ -11,6 +11,7 @@ import 'store/resource.dart';
 class Document extends Model {
     String _id;
     String contentType;
+    String encryptionKey = '';
     List<int> content;
 
     StoreResource _store;
@@ -19,18 +20,28 @@ class Document extends Model {
 
     Document.fromJson(Map json) :
             this._id = json['id'],
-            this.contentType = json['content_type'];
+            this.contentType = json['content_type'],
+            this.encryptionKey = json.containsKey('encryption_key') ? json['encryption_key'] : '';
 
     /// Prepare the model for saving in the DB.
-    Map toMap() => {
-        'id': _id,
-        'content_type': contentType
-    };
+    Map toMap() {
+        Map map = {
+            'id': _id,
+            'content_type': contentType
+        };
+        if (encryptionKey.isNotEmpty) {
+            map['encryption_key'] = encryptionKey;
+        }
+        return map;
+    }
 
     /// Populate the model with data from the DB.
     void fromMap(Map map) {
         if (map.containsKey('content_type')) {
             contentType = map['content_type'];
+        }
+        if (map.containsKey('encryption_key')) {
+            encryptionKey = map['encryption_key'];
         }
     }
 
@@ -50,6 +61,12 @@ class Document extends Model {
     StoreResource store() {
         if (_store == null) {
             _store = storageFactory();
+            if (encryptionKey.isNotEmpty) {
+                _store.encryptionKey = encryptionKey;
+            }
+            else if (Config.get('storage/encrypt')) {
+                encryptionKey = _store.generateKey();
+            }
         }
         return _store;
     }
@@ -60,6 +77,9 @@ class Document extends Model {
             throw 'Loading by a field other than ID is not supported.';
         }
         if (await super.load(id, field)) {
+            if (encryptionKey.isEmpty) {  // document isn't encrypted
+                store().encryptionKey = '';
+            }
             return store().ready();
         }
         return new Future.value(false);
@@ -75,8 +95,8 @@ class Document extends Model {
             throw 'Document content has not been set.';
         }
         _resizeImage();
-        await super.save();
         await store().ready();
+        await super.save();
         return store().write(name, content, contentType: contentType);
     }
 

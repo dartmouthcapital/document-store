@@ -10,20 +10,23 @@ import 'helper.dart';
 main() async {
     await initTestConfig();
 
-    test('Constructors, getters and setters.', () {
+    test('Constructors, getters and setters', () {
         var doc = new Document('abcdef');
         expect(doc.id, equals('abcdef'));
         doc.id = 'fedcba';
         expect(doc.id, equals('fedcba'));
 
+        String key = '0PkKJMC0TR6Erq1KE19NLLeNhtwMyaw3vox1eIXmyUs=';
         Map json = {
             'id': 'abcdef',
-            'content_type': 'text/plain'
+            'content_type': 'text/plain',
+            'encryption_key': key
         };
         doc = new Document.fromJson(json);
         expect(doc.toMap(), equals(json));
         expect(doc.toJson(), equals(JSON.encode(json)));
         expect(doc.name, equals('abcdef.txt'));
+        expect(doc.encryptionKey, equals(key));
 
         expect(doc.resource() is DbResource, isTrue);
         expect(doc.store() is StoreResource, isTrue);
@@ -37,7 +40,7 @@ main() async {
         }
     });
 
-    test('Save, load and delete cycle.', () async {
+    test('Save, load and delete cycle', () async {
         // save
         var doc = new Document()
             ..content = [1]
@@ -57,13 +60,13 @@ main() async {
         expect(deleteResult, isTrue);
     });
 
-    test('Loading non-existing documents.', () async {
+    test('Loading non-existing documents', () async {
         var doc = new Document('abcdef');
         var result = await doc.load();
         expect(result, isFalse);
     });
 
-    test('Saving non-existing documents and updates.', () async {
+    test('Saving non-existing documents and updates', () async {
         var doc = new Document('abcdef')
             ..content = [1]
             ..contentType = 'text/plain';
@@ -85,7 +88,7 @@ main() async {
         expect(doc.save(), throwsA(equals('Document content has not been set.')));
     });
 
-    test('Deleting non-existing documents and invalid deletes.', () async {
+    test('Deleting non-existing documents and invalid deletes', () async {
         var doc = new Document('abcdef');
         var result = await doc.delete();
         expect(result, isFalse);
@@ -94,7 +97,7 @@ main() async {
         expect(doc.delete(), throwsA(equals('Cannot delete file without an ID.')));
     });
 
-    test('Images are correctly resized.', () async {
+    test('Images are correctly resized', () async {
         //Config.set('storage/resize_max_width', 500);
 
         // small image, don't resize

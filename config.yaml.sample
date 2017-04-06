@@ -5,6 +5,7 @@ db_size: 8
 storage:
   adapter: "gcloud"
   resize_max_width: 900
+  encrypt: true
 
 gcloud:
   project: "my-project"

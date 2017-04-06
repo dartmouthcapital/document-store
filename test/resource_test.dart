@@ -7,7 +7,7 @@ main() async {
     var resource = resourceFactory({'collection': 'test'}),
         id;
 
-    test('Item was inserted.', () async {
+    test('Item was inserted', () async {
         Map newItem = {
             'foo': 'bar',
             'hello': 'world'
@@ -16,14 +16,14 @@ main() async {
         expect(id, isNotEmpty);
     });
 
-    test('Item exists.', () async {
+    test('Item exists', () async {
         Map item = await resource.findById(id);
         expect(item.length, greaterThan(0));
         expect(item.containsKey('foo'), isTrue);
         expect(item['foo'], equals('bar'));
     });
 
-    test('Item was updated.', () async {
+    test('Item was updated', () async {
         Map updatedItem = {
             '_id': id,
             'hola': 'mundo'
@@ -35,14 +35,14 @@ main() async {
         expect(item.containsKey('hello'), isFalse);
     });
 
-    test('Item deleted.', () async {
+    test('Item deleted', () async {
         var result = await resource.deleteById(id);
         expect(result, isTrue);
         var item = await resource.findById(id);
         expect(item.length, equals(0));
     });
 
-    test('Collection was truncated.', () async {
+    test('Collection was truncated', () async {
         Map newItem = {
             'foo': 'bar',
             'hello': 'world'
