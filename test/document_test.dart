@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
+import '../lib/config.dart';
 import '../lib/document.dart';
 import '../lib/db/resource.dart';
 import '../lib/store/resource.dart';
+import '../lib/store/test.dart';
 import 'helper.dart';
 
 main() async {
@@ -121,5 +123,24 @@ main() async {
         image = decodeImage(doc.content);
         expect(image, isNotNull);
         expect(image.width, equals(500));
+    });
+
+    test('Encryption', () async {
+        assert(Config.get('storage/encrypt'));
+        var doc = new Document('abcdef')
+            ..content = [1]
+            ..contentType = 'text/plain'
+            ..encryptionKey = testEncryptionKey;
+
+        expect(doc.store().encryptionKey, equals(testEncryptionKey));
+        expect(doc.store().client.encryptionKey, equals(testEncryptionKey));
+
+        doc = new Document('abcdef')
+            ..content = [1]
+            ..contentType = 'text/plain'
+            ..encryptionKey = '';
+
+        expect(doc.store().encryptionKey, isEmpty);
+        expect(doc.store().client.encryptionKey, isEmpty);
     });
 }

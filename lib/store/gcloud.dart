@@ -13,8 +13,7 @@ import '../config.dart';
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
 class GCloudStore implements StoreResource {
-    static Storage _storage;
-    static Bucket _bucket;
+    static Bucket bucket;
     GCloudStoreClient client;
 
     GCloudStore(this.client);
@@ -25,7 +24,7 @@ class GCloudStore implements StoreResource {
             throw new BadRequestException({}, 'Name is required.');
         }
         try {
-            await _bucket.writeBytes(name, bytes, contentType: contentType);
+            await bucket.writeBytes(name, bytes, contentType: contentType);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -34,7 +33,7 @@ class GCloudStore implements StoreResource {
 
     /// Fetch an object from the store
     Stream<List<int>> read(String name) {
-        return _bucket.read(name).handleError((e) {
+        return bucket.read(name).handleError((e) {
             throw _handleException(e);
         });
     }
@@ -42,7 +41,7 @@ class GCloudStore implements StoreResource {
     /// Delete an object from the store
     Future<bool> delete(String name) async {
         try {
-            await _bucket.delete(name);
+            await bucket.delete(name);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -51,7 +50,7 @@ class GCloudStore implements StoreResource {
 
     /// Authorize the app with Google
     Future<bool> ready() async {
-        if (_bucket == null) {
+        if (bucket == null) {
             var jsonCredentials = Config.get('gcloud/service_account');
             var credentials = new ServiceAccountCredentials.fromJson(jsonCredentials);
 
@@ -67,9 +66,9 @@ class GCloudStore implements StoreResource {
                 throw new BadRequestException({}, 'GCloud project and bucket name must be specified in the config.');
             }
             try {
-                _storage = new Storage(client, project);
-                if (await _storage.bucketExists(bucketName)) {
-                    _bucket = _storage.bucket(bucketName);
+                var storage = new Storage(client, project);
+                if (await storage.bucketExists(bucketName)) {
+                    bucket = storage.bucket(bucketName);
                     return true;
                 }
                 else {
@@ -132,8 +131,10 @@ class GCloudStoreClient extends http.IOClient {
         if (key == null || key.isEmpty) {
             keyGen = null;
         }
-        else if (keyGen != null) {
-            keyGen.key = key;
+        else {
+            keyGen == null
+                ? keyGen = new EncryptionKey(key)
+                : keyGen.key = key;
         }
     }
 

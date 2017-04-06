@@ -25,13 +25,13 @@ abstract class StoreResource {
 
 // Instantiate a new storage factory.
 StoreResource storageFactory() {
+    var client = new GCloudStoreClient();
     String adapter = Config.get('storage/adapter');
     switch (adapter) {
         case 'test':
-            return new TestStore();
+            return new TestGCloudStore(client);
         case 'gcloud':
         default:
-            var client = new GCloudStoreClient();
             return new GCloudStore(client);
     }
 }

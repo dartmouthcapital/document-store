@@ -11,9 +11,8 @@ import 'store/resource.dart';
 class Document extends Model {
     String _id;
     String contentType;
-    String encryptionKey = '';
+    String encryptionKey;
     List<int> content;
-
     StoreResource _store;
 
     Document([this._id]);
@@ -29,7 +28,7 @@ class Document extends Model {
             'id': _id,
             'content_type': contentType
         };
-        if (encryptionKey.isNotEmpty) {
+        if (encryptionKey != null && encryptionKey.isNotEmpty) {
             map['encryption_key'] = encryptionKey;
         }
         return map;
@@ -61,10 +60,10 @@ class Document extends Model {
     StoreResource store() {
         if (_store == null) {
             _store = storageFactory();
-            if (encryptionKey.isNotEmpty) {
+            if (encryptionKey != null && encryptionKey.isNotEmpty) {
                 _store.encryptionKey = encryptionKey;
             }
-            else if (Config.get('storage/encrypt')) {
+            else if (encryptionKey == null && Config.get('storage/encrypt')) {
                 encryptionKey = _store.generateKey();
             }
         }
