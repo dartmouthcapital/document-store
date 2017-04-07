@@ -8,8 +8,14 @@ class MongoResource implements DbResource {
     String collectionName;
     MongoPool _dbPool;
 
-    MongoResource(String databaseName, String databaseUrl, int databasePoolSize, [String collection]) {
-        _dbPool = new MongoPool(databaseUrl + databaseName, databasePoolSize);
+    MongoResource(String databaseName, String databaseUrl, int databasePoolSize, {Map auth, String collection}) {
+        _dbPool = new MongoPool(
+            databaseUrl + databaseName,
+            databasePoolSize,
+            auth != null ? auth['username'] : null,
+            auth != null ? auth['password'] : null,
+            auth != null ? auth['source'] : null
+        );
         collectionName = collection;
     }
 
@@ -122,14 +128,24 @@ class MongoResource implements DbResource {
 /// Mongo connection pool
 class MongoPool extends ConnectionPool<Db> {
     String uri;
-    MongoPool(String this.uri, int poolSize) : super(poolSize);
+    String _username;
+    String _password;
+    String _authSource;
 
-    Future<Db> openNewConnection() {
-        var conn = new Db(uri);
-        return conn.open().then((_) => conn);
+    MongoPool(String this.uri, int poolSize, [String this._username, String this._password, String this._authSource])
+        : super(poolSize);
+
+    Future<Db> openNewConnection() async {
+        String uri = this.uri + (_authSource != null ? '?authSource=$_authSource' : '');
+        Db db = new Db(uri);
+        await db.open();
+        if (_username != null && _password != null) {
+            await db.authenticate(_username, _password);
+        }
+        return db;
     }
 
-    void closeConnection(Db conn) {
-        conn.close();
+    void closeConnection(Db db) {
+        db.close();
     }
 }

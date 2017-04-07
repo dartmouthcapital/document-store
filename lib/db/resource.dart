@@ -29,9 +29,10 @@ abstract class DbResource {
 // The only available resource type, at this point.
 DbResource resourceFactory([Map customParams]) {
     var resource = new MongoResource(
-        Config.get('db_name'),
-        Config.get('db_uri'),
-        Config.get('db_size')
+        Config.get('db/mongodb/db_name'),
+        Config.get('db/mongodb/uri'),
+        Config.get('db/mongodb/pool_size'),
+        auth: Config.get('db/mongodb/auth')
     );
     if (customParams.containsKey('collection')) {
         resource.collectionName = customParams['collection'];
