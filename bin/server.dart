@@ -24,7 +24,9 @@ main(List<String> args) async {
 
     printRoutes(app.appRouter);
 
-    io.serve(handler, 'localhost', 8080).then((server) {
+    assert(Config.get('server/host') is String);
+    assert(Config.get('server/port') is int);
+    io.serve(handler, Config.get('server/host'), Config.get('server/port')).then((server) {
         print('Serving at http://${server.address.host}:${server.port}');
     }).catchError((error) => print(error));
 }
