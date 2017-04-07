@@ -51,8 +51,8 @@ class TestStore implements StoreResource {
 
 /// Test GCloud storage adapter
 class TestGCloudStore extends GCloudStore {
-    TestGCloudStore(client): super(client) {
-        GCloudStore.bucket = new TestGCloudBucket();
+    TestGCloudStore(client): super(client, 'test-project', 'test-bucket', '{}') {
+        GCloudStore.buckets['test-project-test-bucket'] = new TestGCloudBucket();
     }
 }
 

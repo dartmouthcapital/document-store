@@ -32,6 +32,11 @@ StoreResource storageFactory() {
             return new TestGCloudStore(client);
         case 'gcloud':
         default:
-            return new GCloudStore(client);
+            return new GCloudStore(
+                client,
+                Config.get('gcloud/project'),
+                Config.get('gcloud/bucket'),
+                Config.get('gcloud/service_account')
+            );
     }
 }

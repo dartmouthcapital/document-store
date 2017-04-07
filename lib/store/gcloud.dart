@@ -8,15 +8,17 @@ import 'package:gcloud/storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_exception/http_exception.dart';
 import 'resource.dart';
-import '../config.dart';
 
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
 class GCloudStore implements StoreResource {
-    static Bucket bucket;
+    static Map<String, Bucket> buckets = {};
     GCloudStoreClient client;
+    String project;
+    String bucketName;
+    String accountCredentials;
 
-    GCloudStore(this.client);
+    GCloudStore(this.client, this.project, this.bucketName, this.accountCredentials);
 
     /// Add a new object to the store
     Future<bool> write(String name, List<int> bytes, {String contentType}) async {
@@ -50,36 +52,35 @@ class GCloudStore implements StoreResource {
 
     /// Authorize the app with Google
     Future<bool> ready() async {
-        if (bucket == null) {
-            var jsonCredentials = Config.get('gcloud/service_account');
-            var credentials = new ServiceAccountCredentials.fromJson(jsonCredentials);
-
-            // Get an HTTP authenticated client using the service account credentials.
-            var scopes = []
-                ..addAll(Storage.SCOPES);
-            var client = await clientViaServiceAccount(credentials, scopes, baseClient: this.client);
-
-            // Instantiate objects to access Cloud Storage API.
-            String project = Config.get('gcloud/project');
-            String bucketName = Config.get('gcloud/bucket');
-            if (project == null || bucketName == null) {
-                throw new BadRequestException({}, 'GCloud project and bucket name must be specified in the config.');
-            }
-            try {
-                var storage = new Storage(client, project);
-                if (await storage.bucketExists(bucketName)) {
-                    bucket = storage.bucket(bucketName);
-                    return true;
-                }
-                else {
-                    throw new NotFoundException({}, 'GCloud bucket "{$bucketName}" does not exist.');
-                }
-            } catch (e) {
-                throw _handleException(e);
-            }
+        var bucketKey = project + '-' + bucketName;
+        if (GCloudStore.buckets.containsKey(bucketKey)) {
+            return new Future.value(true);
         }
-        return new Future.value(true);
+        var credentials = new ServiceAccountCredentials.fromJson(accountCredentials);
+        // Get an HTTP authenticated client using the service account credentials.
+        var scopes = []
+            ..addAll(Storage.SCOPES);
+        var client = await clientViaServiceAccount(credentials, scopes, baseClient: this.client);
+
+        // Instantiate objects to access Cloud Storage API.
+        if (project == null || bucketName == null) {
+            throw new BadRequestException({}, 'GCloud project and bucket name must be specified.');
+        }
+        try {
+            var storage = new Storage(client, project);
+            if (await storage.bucketExists(bucketName)) {
+                GCloudStore.buckets[bucketKey] = storage.bucket(bucketName);
+                return true;
+            }
+            else {
+                throw new NotFoundException({}, 'GCloud bucket "{$bucketName}" does not exist.');
+            }
+        } catch (e) {
+            throw _handleException(e);
+        }
     }
+
+    Bucket get bucket => GCloudStore.buckets[project + '-' + bucketName];
 
     /// Returns the encryption key used, if available
     String get encryptionKey => client.encryptionKey;

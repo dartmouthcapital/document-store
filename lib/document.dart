@@ -39,9 +39,9 @@ class Document extends Model {
         if (map.containsKey('content_type')) {
             contentType = map['content_type'];
         }
-        if (map.containsKey('encryption_key')) {
-            encryptionKey = map['encryption_key'];
-        }
+        encryptionKey = map.containsKey('encryption_key')
+            ? encryptionKey = map['encryption_key']
+            : '';
     }
 
     String get collection => 'documents';
