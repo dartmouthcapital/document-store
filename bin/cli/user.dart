@@ -58,8 +58,8 @@ class EditCommand extends Command {
             ..addOption('id', abbr: 'i', help: 'ID of User to edit.')
             ..addOption('username', abbr: 'u', help: 'Username of User to edit.')
             ..addOption('new_username', abbr: 'n', help: 'New username for User.')
-            ..addFlag('enable', abbr: 'e', help: 'Enable the User.')
-            ..addFlag('disable', abbr: 'd', help: 'Disable the User.');
+            ..addFlag('enable', abbr: 'e', help: 'Enable the User.', negatable: false)
+            ..addFlag('disable', abbr: 'd', help: 'Disable the User.', negatable: false);
     }
 
     run() async {
@@ -135,7 +135,9 @@ class DeleteCommand extends Command {
     final String description = 'Delete a User.';
 
     DeleteCommand() {
-        argParser.addOption('username', abbr: 'u', help: 'Username to delete.');
+        argParser
+            ..addOption('id', abbr: 'i', help: 'ID of User to delete.')
+            ..addOption('username', abbr: 'u', help: 'Username to delete.');
     }
 
     run() async {
@@ -144,7 +146,7 @@ class DeleteCommand extends Command {
         if (id == null && username == null) {
             throw new UsageException(
                 '"id" or "username" must be set.',
-                'info [-i "123456" -u "testUser"]'
+                'delete [-i "123456" -u "testUser"]'
             );
         }
         var identifier = id != null ? id : username;
