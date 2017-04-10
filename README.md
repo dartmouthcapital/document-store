@@ -36,6 +36,7 @@ Authorization: Basic [AUTH_TOKEN]
 
 ### Create a document
 
+#### Request
 ```
 POST http://localhost:8080/ HTTP/1.1
 Content-Type: image/jpeg
@@ -45,6 +46,7 @@ Authorization: Basic [AUTH_TOKEN]
 [JPEG_DATA]
 ```
 
+#### Response
 ```$json
 {
     "id":"58ebcc02bd51c69a23514e49",
@@ -106,7 +108,6 @@ Usage: `ds-cli user delete [arguments]`
 Usage: `ds-cli user edit [arguments]`
 
 ```
--h, --help            Print this usage information.
 -i, --id              ID of User to edit.
 -u, --username        Username of User to edit.
 -n, --new_username    New username for User.
@@ -128,7 +129,6 @@ Usage: `ds-cli user info [arguments]`
 Usage: `ds-cli user register [arguments]`
 
 ```
--h, --help        Print this usage information.
 -u, --username    Username for the new User.
 -p, --password    Password for the new User.
 ```
