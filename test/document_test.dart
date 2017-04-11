@@ -42,6 +42,18 @@ main() async {
         }
     });
 
+    test('Document within a directory', () {
+        Map json = {
+            'id': 'abcdef',
+            'content_type': 'text/plain',
+            'directory': 'subdir'
+        };
+        var doc = new Document.fromJson(json);
+        expect(doc.id, equals('abcdef'));  // id is unaffected
+        expect(doc.directory, equals('subdir'));
+        expect(doc.name, equals('subdir/abcdef.txt'));
+    });
+
     test('Save, load and delete cycle', () async {
         // save
         var doc = new Document()

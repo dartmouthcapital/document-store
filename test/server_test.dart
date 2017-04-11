@@ -141,4 +141,34 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
         });
     });
+
+    group('Testing POST with directory', () {
+        var docId;
+        test('POST new document', () async {
+            Request request = createRequest(
+                'POST',
+                '/?directory=subdir',
+                body: 'text content',
+                headers: {'content-type': 'text/plain'}
+            );
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+            Map body = JSON.decode(await response.readAsString());
+            expect(body.containsKey('id'), isTrue);
+            expect(body['id'], isNotNull);
+            expect(body.containsKey('content_type'), isTrue);
+            expect(body['content_type'], equals('text/plain'));
+            expect(body.containsKey('directory'), isTrue);
+            expect(body['directory'], equals('subdir'));
+            docId = body['id'];
+        });
+
+        test('GET POST\'ed document', () async {
+            Request request = createRequest('GET', '/' + docId);
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+            String body = await response.readAsString();
+            expect(body, equals('test file contents'));
+        });
+    });
 }

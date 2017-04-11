@@ -21,9 +21,10 @@ Router appRouter = router(middleware: _authMw)
         }
         throw new NotFoundException();
     })
-    ..post('/', (Request request) async {
+    ..post('/{?directory}', (Request request) async {
         var bin = new BytesBuilder(),
-            contentType = request.mimeType;
+            contentType = request.mimeType,
+            directory = getPathParameter(request, 'directory');
         if (contentType == null || contentType.isEmpty) {
             throw new BadRequestException(null, 'Content-type header must be set.');
         }
@@ -32,6 +33,7 @@ Router appRouter = router(middleware: _authMw)
         }
         Document doc = new Document()
             ..contentType = contentType
+            ..directory = directory
             ..content = bin.toBytes();
 
         if (await doc.save()) {

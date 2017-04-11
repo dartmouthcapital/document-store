@@ -11,6 +11,7 @@ import 'store/resource.dart';
 class Document extends Model {
     String _id;
     String contentType;
+    String directory;
     String encryptionKey;
     List<int> content;
     StoreResource _store;
@@ -20,6 +21,7 @@ class Document extends Model {
     Document.fromJson(Map json) :
             this._id = json['id'],
             this.contentType = json['content_type'],
+            this.directory = json['directory'],
             this.encryptionKey = json.containsKey('encryption_key') ? json['encryption_key'] : '';
 
     /// Prepare the model for saving in the DB.
@@ -28,6 +30,9 @@ class Document extends Model {
             'id': _id,
             'content_type': contentType
         };
+        if (directory != null && directory.isNotEmpty) {
+            map['directory'] = directory;
+        }
         if (encryptionKey != null && encryptionKey.isNotEmpty) {
             map['encryption_key'] = encryptionKey;
         }
@@ -38,6 +43,9 @@ class Document extends Model {
     void fromMap(Map map) {
         if (map.containsKey('content_type')) {
             contentType = map['content_type'];
+        }
+        if (map.containsKey('directory')) {
+            directory = map['directory'];
         }
         encryptionKey = map.containsKey('encryption_key')
             ? encryptionKey = map['encryption_key']
@@ -53,7 +61,7 @@ class Document extends Model {
         if (ext == null) {
             throw new Exception('Could not determine file extension from content type.');
         }
-        return _id + '.' + ext;
+        return (directory != null ? directory + '/' : '') + _id + '.' + ext;
     }
 
     /// Get the storage model for reading and saving files.
