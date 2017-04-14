@@ -4,7 +4,7 @@ A service for serving and storing documents from the Google Cloud.
 
 ## Installation + Configuration
 
-Copy `config.yaml.sample` as `config.yaml` and edit accordingly.
+Copy `config.yaml.sample` as `config.yaml` and edit accordingly, and run `pub get`.
 
 ## Server
 
@@ -45,6 +45,8 @@ Authorization: Basic [AUTH_TOKEN]
 
 [JPEG_DATA]
 ```
+
+Optionally pass `directory` as a query parameter to specify a folder in the storage bucket.
 
 #### Response
 ```$json

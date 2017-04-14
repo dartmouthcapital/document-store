@@ -1,7 +1,6 @@
 name: document_store
 description: An interface for serving and storing documents.
 version: 0.0.1
-homepage: https://www.safedinar.com
 author: Todd Mannherz <todd.mannherz@gmail.com>
 
 environment:
