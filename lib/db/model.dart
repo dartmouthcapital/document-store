@@ -1,5 +1,3 @@
-library document_store;
-
 import 'dart:async';
 import 'dart:convert';
 import 'resource.dart';

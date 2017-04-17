@@ -1,5 +1,3 @@
-library document_store;
-
 import 'dart:async';
 import 'package:image/image.dart';
 import 'config.dart';
