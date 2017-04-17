@@ -30,8 +30,8 @@ main() async {
         expect(doc.name, equals('abcdef.txt'));
         expect(doc.encryptionKey, equals(key));
 
-        expect(doc.resource() is DbResource, isTrue);
-        expect(doc.store() is StoreResource, isTrue);
+        expect(doc.resource is DbResource, isTrue);
+        expect(doc.store is StoreResource, isTrue);
 
         doc.contentType = 'bogus';
         try {
@@ -144,15 +144,15 @@ main() async {
             ..contentType = 'text/plain'
             ..encryptionKey = testEncryptionKey;
 
-        expect(doc.store().encryptionKey, equals(testEncryptionKey));
-        expect(doc.store().client.encryptionKey, equals(testEncryptionKey));
+        expect(doc.store.encryptionKey, equals(testEncryptionKey));
+        expect(doc.store.client.encryptionKey, equals(testEncryptionKey));
 
         doc = new Document('abcdef')
             ..content = [1]
             ..contentType = 'text/plain'
             ..encryptionKey = '';
 
-        expect(doc.store().encryptionKey, isEmpty);
-        expect(doc.store().client.encryptionKey, isEmpty);
+        expect(doc.store.encryptionKey, isEmpty);
+        expect(doc.store.client.encryptionKey, isEmpty);
     });
 }

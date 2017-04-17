@@ -12,13 +12,13 @@ import 'resource.dart';
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
 class GCloudStore implements StoreResource {
-    static Map<String, Bucket> buckets = {};
-    GCloudStoreClient client;
+    GCloudStoreClient _client;
+    Bucket _bucket;
     String project;
     String bucketName;
     String accountCredentials;
 
-    GCloudStore(this.client, this.project, this.bucketName, this.accountCredentials);
+    GCloudStore(this.project, this.bucketName, this.accountCredentials);
 
     /// Add a new object to the store
     Future<bool> write(String name, List<int> bytes, {String contentType}) async {
@@ -26,7 +26,7 @@ class GCloudStore implements StoreResource {
             throw new BadRequestException({}, 'Name is required.');
         }
         try {
-            await bucket.writeBytes(name, bytes, contentType: contentType);
+            await _bucket.writeBytes(name, bytes, contentType: contentType);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -35,7 +35,7 @@ class GCloudStore implements StoreResource {
 
     /// Fetch an object from the store
     Stream<List<int>> read(String name) {
-        return bucket.read(name).handleError((e) {
+        return _bucket.read(name).handleError((e) {
             throw _handleException(e);
         });
     }
@@ -43,7 +43,7 @@ class GCloudStore implements StoreResource {
     /// Delete an object from the store
     Future<bool> delete(String name) async {
         try {
-            await bucket.delete(name);
+            await _bucket.delete(name);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -52,8 +52,7 @@ class GCloudStore implements StoreResource {
 
     /// Authorize the app with Google
     Future<bool> ready() async {
-        var bucketKey = project + '-' + bucketName;
-        if (GCloudStore.buckets.containsKey(bucketKey)) {
+        if (_bucket != null) {
             return new Future.value(true);
         }
         var credentials = new ServiceAccountCredentials.fromJson(accountCredentials);
@@ -69,7 +68,7 @@ class GCloudStore implements StoreResource {
         try {
             var storage = new Storage(client, project);
             if (await storage.bucketExists(bucketName)) {
-                GCloudStore.buckets[bucketKey] = storage.bucket(bucketName);
+                _bucket = storage.bucket(bucketName);
                 return true;
             }
             else {
@@ -80,7 +79,27 @@ class GCloudStore implements StoreResource {
         }
     }
 
-    Bucket get bucket => GCloudStore.buckets[project + '-' + bucketName];
+    /// Close the store connection
+    void close() {
+        _client.close();
+        _client = null;
+        _bucket = null;
+    }
+
+    GCloudStoreClient get client {
+        if (_client == null) {
+            _client = new GCloudStoreClient();
+        }
+        return _client;
+    }
+
+    void set client(GCloudStoreClient client) {
+        _client = client;
+    }
+
+    void set bucket(Bucket bucket) {
+        _bucket = bucket;
+    }
 
     /// Returns the encryption key used, if available
     String get encryptionKey => client.encryptionKey;

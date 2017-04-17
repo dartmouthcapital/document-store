@@ -4,7 +4,7 @@ import 'helper.dart';
 
 main() async {
     await initTestConfig();
-    await new User()..resource().truncate();
+    await new User()..resource.truncate();
 
     test('Constructors, getters and setters', () {
         var user = new User('abcdef');

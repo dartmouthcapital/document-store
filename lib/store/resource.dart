@@ -19,21 +19,22 @@ abstract class StoreResource {
     /// Returns when the store is ready to process
     Future<bool> ready();
 
+    /// Close the store connection
+    void close();
+
     /// Generate a new encryption key
     String generateKey();
 }
 
 // Instantiate a new storage factory.
 StoreResource storageFactory() {
-    var client = new GCloudStoreClient();
     String adapter = Config.get('storage/adapter');
     switch (adapter) {
         case 'test':
-            return new TestGCloudStore(client);
+            return new TestGCloudStore();
         case 'gcloud':
         default:
             return new GCloudStore(
-                client,
                 Config.get('gcloud/project'),
                 Config.get('gcloud/bucket'),
                 Config.get('gcloud/service_account')

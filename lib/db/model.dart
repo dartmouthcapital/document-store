@@ -16,7 +16,7 @@ abstract class Model {
     set id (String newId);
 
     /// Get the resource model for interacting with the DB.
-    DbResource resource() {
+    DbResource get resource {
         if (_resource == null) {
             _resource = resourceFactory({'collection': collection});
         }
@@ -39,10 +39,10 @@ abstract class Model {
         }
         Map data;
         if (field == 'id') {
-            data = await resource().findById(this.id);
+            data = await resource.findById(this.id);
         }
         else {
-            List results = await resource().find({field: id});
+            List results = await resource.find({field: id});
             data = results.length > 0 ? results.first : {};
         }
         if (data.length > 0) {
@@ -58,7 +58,7 @@ abstract class Model {
     /// Save the model to the DB.
     Future<bool> save() async {
         if (id == null) {  // insert
-            var newId = await resource().insert(toMap());
+            var newId = await resource.insert(toMap());
             if (newId != null) {
                 id = newId;
                 return true;
@@ -66,7 +66,7 @@ abstract class Model {
             return false;
         }
         else {  // update
-            return resource().update(toMap());
+            return resource.update(toMap());
         }
     }
 
@@ -80,10 +80,10 @@ abstract class Model {
             throw 'Cannot delete model without an ID.';
         }
         if (field == 'id') {
-            return resource().deleteById(id);
+            return resource.deleteById(id);
         }
         else {
-            return resource().delete({field: id});
+            return resource.delete({field: id});
         }
     }
 }

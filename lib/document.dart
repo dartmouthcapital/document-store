@@ -65,7 +65,7 @@ class Document extends Model {
     }
 
     /// Get the storage model for reading and saving files.
-    StoreResource store() {
+    StoreResource get store {
         if (_store == null) {
             _store = storageFactory();
             if (encryptionKey != null && encryptionKey.isNotEmpty) {
@@ -85,15 +85,15 @@ class Document extends Model {
         }
         if (await super.load(id, field)) {
             if (encryptionKey.isEmpty) {  // document isn't encrypted
-                store().encryptionKey = '';
+                store.encryptionKey = '';
             }
-            return store().ready();
+            return store.ready();
         }
         return new Future.value(false);
     }
 
     Stream<List<int>> streamContent() {
-        return store().read(name);
+        return store.read(name);
     }
 
     /// Save the document to the file store.
@@ -102,9 +102,9 @@ class Document extends Model {
             throw 'Document content has not been set.';
         }
         _resizeImage();
-        await store().ready();
+        await store.ready();
         await super.save();
-        return store().write(name, content, contentType: contentType);
+        return store.write(name, content, contentType: contentType);
     }
 
     /// Delete the document from the file store.
@@ -117,12 +117,19 @@ class Document extends Model {
             throw 'Cannot delete file without an ID.';
         }
         if (await load()) {
-            if (await store().delete(name)) {
+            if (await store.delete(name)) {
                 return super.delete();
             }
             throw 'Error deleting document.';
         }
         return new Future.value(false);
+    }
+
+    /// Free up resources from the storage object
+    void destruct() {
+        if (_store != null) {
+            _store.close();
+        }
     }
 
     bool _canResize () {
