@@ -1,6 +1,4 @@
 #!/usr/bin/env dart
-import 'package:logging/logging.dart';
-import 'package:logging_handlers/server_logging_handlers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';

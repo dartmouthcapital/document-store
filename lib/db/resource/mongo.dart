@@ -5,17 +5,19 @@ import '../resource.dart';
 
 /// MongoDB resource model
 class MongoResource implements DbResource {
+    static MongoPool _pool;
     String collectionName;
-    MongoPool _dbPool;
 
     MongoResource(String databaseName, String databaseUrl, int databasePoolSize, {Map auth, String collection}) {
-        _dbPool = new MongoPool(
-            databaseUrl + databaseName,
-            databasePoolSize,
-            auth != null ? auth['username'] : null,
-            auth != null ? auth['password'] : null,
-            auth != null ? auth['source'] : null
-        );
+        if (_pool == null) {
+            _pool = new MongoPool(
+                databaseUrl + databaseName,
+                databasePoolSize,
+                auth != null ? auth['username'] : null,
+                auth != null ? auth['password'] : null,
+                auth != null ? auth['source'] : null
+            );
+        }
         collectionName = collection;
     }
 
@@ -25,11 +27,11 @@ class MongoResource implements DbResource {
         assert(data['_id'] == null);
         data['_id'] = new ObjectId().toHexString();
         data.remove('id');
-        return _dbPool.getConnection().then((ManagedConnection mc) {
+        return _pool.getConnection().then((ManagedConnection mc) {
             Db db = mc.conn;
             DbCollection collection = db.collection(collectionName);
             return collection.insert(data).then((status) {
-                _dbPool.releaseConnection(mc);
+                _pool.releaseConnection(mc);
                 return (status['ok'] == 1) ? data['_id'] : null;
             });
         });
@@ -49,11 +51,11 @@ class MongoResource implements DbResource {
         }
         assert(id != null);
         Map query = {'_id': id};
-        return _dbPool.getConnection().then((ManagedConnection mc) {
+        return _pool.getConnection().then((ManagedConnection mc) {
             Db db = mc.conn;
             DbCollection collection = db.collection(collectionName);
             return collection.update(query, data).then((status) {
-                _dbPool.releaseConnection(mc);
+                _pool.releaseConnection(mc);
                 return (status['ok'] == 1) ? true : false;
             });
         });
@@ -62,11 +64,11 @@ class MongoResource implements DbResource {
     /// Query the collection.
     Future<List> find(Map query) {
         _checkCollection();
-        return _dbPool.getConnection().then((ManagedConnection mc) async {
+        return _pool.getConnection().then((ManagedConnection mc) async {
             DbCollection collection = new DbCollection(mc.conn, collectionName);
             List<Map> list = await collection.find(query).toList();
             _standardize(list);
-            _dbPool.releaseConnection(mc);
+            _pool.releaseConnection(mc);
             return list;
         });
     }
@@ -87,11 +89,11 @@ class MongoResource implements DbResource {
     /// Delete based on the provided query.
     Future<bool> delete(Map query) {
         _checkCollection();
-        return _dbPool.getConnection().then((ManagedConnection mc) {
+        return _pool.getConnection().then((ManagedConnection mc) {
             Db database = mc.conn;
             DbCollection collection = database.collection(collectionName);
             return collection.remove(query).then((status) {
-                _dbPool.releaseConnection(mc);
+                _pool.releaseConnection(mc);
                 return status['ok'] == 1 && status['n'] > 0;
             });
         });

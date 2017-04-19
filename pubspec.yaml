@@ -16,8 +16,6 @@ dependencies:
   googleapis_auth:
   http:
   image:
-  logging:
-  logging_handlers:
   mongo_dart:
   option:
   shelf_auth:
