@@ -17,10 +17,8 @@ Router appRouter = router(middleware: _authMw)
             await for (var bytes in doc.streamContent()) {
                 content.addAll(bytes);
             }
-            doc.destruct();
             return new Response.ok(content, headers: {'content-type': doc.contentType});
         }
-        doc.destruct();
         throw new NotFoundException();
     })
     ..post('/{?directory}', (Request request) async {
@@ -39,21 +37,16 @@ Router appRouter = router(middleware: _authMw)
             ..content = bin.toBytes();
 
         if (await doc.save()) {
-            String json = doc.toJson();
-            doc.destruct();
-            return new Response.ok(json, headers: {'content-type': 'application/json'});
+            return new Response.ok(doc.toJson(), headers: {'content-type': 'application/json'});
         }
-        doc.destruct();
         throw new HttpException(); // ignore: conflicting_dart_import
     })
     ..delete('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
         if (await doc.delete()) {
-            doc.destruct();
             return new Response.ok('Document deleted.');
         }
-        doc.destruct();
         throw new NotFoundException();
     })
     ..add('/', ['OPTIONS'], (Request request) {

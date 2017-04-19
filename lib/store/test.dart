@@ -45,9 +45,6 @@ class TestStore implements StoreResource {
     /// Returns when the store is ready to process
     Future<bool> ready() => new Future.value(true);
 
-    /// Close the store connection
-    void close() {}
-
     /// Generate a new encryption key
     String generateKey() => encryptionKey;
 }
@@ -55,7 +52,7 @@ class TestStore implements StoreResource {
 /// Test GCloud storage adapter
 class TestGCloudStore extends GCloudStore {
     TestGCloudStore(): super('test-project', 'test-bucket', '{}') {
-        bucket = new TestGCloudBucket();
+        GCloudStore.buckets['test-project-test-bucket'] = new TestGCloudBucket();
     }
 }
 

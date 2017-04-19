@@ -145,7 +145,6 @@ main() async {
             ..encryptionKey = testEncryptionKey;
 
         expect(doc.store.encryptionKey, equals(testEncryptionKey));
-        expect(doc.store.client.encryptionKey, equals(testEncryptionKey));
 
         doc = new Document('abcdef')
             ..content = [1]
@@ -153,6 +152,5 @@ main() async {
             ..encryptionKey = '';
 
         expect(doc.store.encryptionKey, isEmpty);
-        expect(doc.store.client.encryptionKey, isEmpty);
     });
 }

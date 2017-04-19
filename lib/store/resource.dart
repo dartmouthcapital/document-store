@@ -19,9 +19,6 @@ abstract class StoreResource {
     /// Returns when the store is ready to process
     Future<bool> ready();
 
-    /// Close the store connection
-    void close();
-
     /// Generate a new encryption key
     String generateKey();
 }

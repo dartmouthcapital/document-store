@@ -8,7 +8,7 @@ Copy `config.yaml.sample` as `config.yaml` and edit accordingly, and run `pub ge
 
 ## Server
 
-Run `dart bin/server.dart`
+Run `dart bin/server.dart` or to run in the background, `nohup dart bin/server.dart >> /var/log/dart.log 2>&1`
 
 Provide a Basic Auth header when connecting to the API.
 

@@ -123,13 +123,6 @@ class Document extends Model {
         return new Future.value(false);
     }
 
-    /// Free up resources from the storage object
-    void destruct() {
-        if (_store != null) {
-            _store.close();
-        }
-    }
-
     bool _canResize () {
         switch (contentType) {
             case 'image/png':

@@ -12,13 +12,16 @@ import 'resource.dart';
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
 class GCloudStore implements StoreResource {
-    GCloudStoreClient _client;
-    Bucket _bucket;
+    static Map<String, Bucket> buckets = {};
+    GCloudStoreClient _baseClient;
+    AutoRefreshingAuthClient _apiClient;
     String project;
     String bucketName;
     String accountCredentials;
 
-    GCloudStore(this.project, this.bucketName, this.accountCredentials);
+    GCloudStore(this.project, this.bucketName, this.accountCredentials) {
+        _baseClient = new GCloudStoreClient();
+    }
 
     /// Add a new object to the store
     Future<bool> write(String name, List<int> bytes, {String contentType}) async {
@@ -26,7 +29,7 @@ class GCloudStore implements StoreResource {
             throw new BadRequestException({}, 'Name is required.');
         }
         try {
-            await _bucket.writeBytes(name, bytes, contentType: contentType);
+            await bucket.writeBytes(name, bytes, contentType: contentType);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -35,7 +38,7 @@ class GCloudStore implements StoreResource {
 
     /// Fetch an object from the store
     Stream<List<int>> read(String name) {
-        return _bucket.read(name).handleError((e) {
+        return bucket.read(name).handleError((e) {
             throw _handleException(e);
         });
     }
@@ -43,7 +46,7 @@ class GCloudStore implements StoreResource {
     /// Delete an object from the store
     Future<bool> delete(String name) async {
         try {
-            await _bucket.delete(name);
+            await bucket.delete(name);
             return true;
         } catch (e) {
             throw _handleException(e);
@@ -52,23 +55,24 @@ class GCloudStore implements StoreResource {
 
     /// Authorize the app with Google
     Future<bool> ready() async {
-        if (_bucket != null) {
+        var bucketKey = project + '-' + bucketName;
+        if (GCloudStore.buckets.containsKey(bucketKey)) {
             return new Future.value(true);
         }
         var credentials = new ServiceAccountCredentials.fromJson(accountCredentials);
         // Get an HTTP authenticated client using the service account credentials.
         var scopes = []
             ..addAll(Storage.SCOPES);
-        var client = await clientViaServiceAccount(credentials, scopes, baseClient: this.client);
+        _apiClient = await clientViaServiceAccount(credentials, scopes, baseClient: _baseClient);
 
         // Instantiate objects to access Cloud Storage API.
         if (project == null || bucketName == null) {
             throw new BadRequestException({}, 'GCloud project and bucket name must be specified.');
         }
         try {
-            var storage = new Storage(client, project);
+            var storage = new Storage(_apiClient, project);
             if (await storage.bucketExists(bucketName)) {
-                _bucket = storage.bucket(bucketName);
+                GCloudStore.buckets[bucketKey] = storage.bucket(bucketName);
                 return true;
             }
             else {
@@ -81,35 +85,21 @@ class GCloudStore implements StoreResource {
 
     /// Close the store connection
     void close() {
-        _client.close();
-        _client = null;
-        _bucket = null;
+        _baseClient.close();
+        _baseClient = null;
     }
 
-    GCloudStoreClient get client {
-        if (_client == null) {
-            _client = new GCloudStoreClient();
-        }
-        return _client;
-    }
-
-    void set client(GCloudStoreClient client) {
-        _client = client;
-    }
-
-    void set bucket(Bucket bucket) {
-        _bucket = bucket;
-    }
+    Bucket get bucket => GCloudStore.buckets[project + '-' + bucketName];
 
     /// Returns the encryption key used, if available
-    String get encryptionKey => client.encryptionKey;
+    String get encryptionKey => _baseClient.encryptionKey;
 
     /// Set the encryption key to be used, if available
-    set encryptionKey(String key) => client.encryptionKey = key;
+    set encryptionKey(String key) => _baseClient.encryptionKey = key;
 
     /// Generate a new encryption key
     String generateKey() {
-        return client.generateKey();
+        return _baseClient.generateKey();
     }
 
     _handleException(e) {
