@@ -45,6 +45,9 @@ class TestStore implements StoreResource {
     /// Returns when the store is ready to process
     Future<bool> ready() => new Future.value(true);
 
+    /// Purge all files from the store
+    Future<bool> purge() => new Future.value(false);
+
     /// Generate a new encryption key
     String generateKey() => encryptionKey;
 }

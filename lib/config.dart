@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dart_config/default_server.dart';
 
 /// Singleton config class
@@ -60,4 +61,8 @@ class Config {
         }
         map[last] = value;
     }
+
+    /// Important directories for the app
+    static String get appPath => Directory.current.absolute.path;
+    static String get tempPath => appPath + Platform.pathSeparator + 'var';
 }

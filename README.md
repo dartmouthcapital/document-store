@@ -10,6 +10,8 @@ Copy `config.yaml.sample` as `config.yaml` and edit accordingly, and run `pub ge
 
 Run `dart bin/server.dart` or to run in the background, `nohup dart bin/server.dart >> /var/log/dart.log 2>&1`
 
+Since documents are frequently accessed repeatedly, a local, cached version is stored. The cache can be cleared with a simple cron: `bin/cli.dart document purge_cache`
+
 Provide a Basic Auth header when connecting to the API.
 
 ### Fetch a document
@@ -62,19 +64,20 @@ Optionally pass `directory` as a query parameter to specify a folder in the stor
 Usage: `dart bin/cli.dart <command> <subcommand> [arguments]`
 
 Available commands:
-* `document`   - View and delete Document records.
+* `document`   - Manage Document records.
 * `help`       - Display help information for ds-cli.
 * `user`       - Modify User records.
 
 ### Managing Documents
 
 Available subcommands:
-* `delete`   - Delete a Document.
-* `info`     - View Document details.
+* `delete`      - Delete a Document.
+* `info`        - View Document details.
+* `purge_cache` - Purge the local file cache.
 
 #### Delete
 
-Usage: `ds-cli user delete [arguments]`
+Usage: `ds-cli document delete [arguments]`
 
 ```
 -i, --id          ID of Document to edit.
@@ -82,11 +85,15 @@ Usage: `ds-cli user delete [arguments]`
 
 #### Info
 
-Usage: `ds-cli user info [arguments]`
+Usage: `ds-cli document info [arguments]`
 
 ```
 -i, --id          ID of Document to query.
 ```
+
+#### Cache Purge
+
+Usage: `ds-cli document purge_cache`
 
 ### Managing Users
 

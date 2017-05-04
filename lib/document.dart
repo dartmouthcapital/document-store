@@ -3,6 +3,7 @@ import 'package:image/image.dart';
 import 'config.dart';
 import 'db/model.dart';
 import 'mime_type.dart' as mime;
+import 'store/local.dart';
 import 'store/resource.dart';
 
 /// Base Document class
@@ -12,15 +13,20 @@ class Document extends Model {
     String directory;
     String encryptionKey;
     List<int> content;
-    StoreResource _store;
+    EncryptableStoreResource _remoteStore;
+    LocalStore _localStore;
 
-    Document([this._id]);
+    Document([this._id]) {
+        _localStore = storageFactory('local');
+    }
 
     Document.fromJson(Map json) :
             this._id = json['id'],
             this.contentType = json['content_type'],
             this.directory = json['directory'],
-            this.encryptionKey = json.containsKey('encryption_key') ? json['encryption_key'] : '';
+            this.encryptionKey = json.containsKey('encryption_key') ? json['encryption_key'] : '' {
+        _localStore = storageFactory('local');
+    }
 
     /// Prepare the model for saving in the DB.
     Map toMap() {
@@ -62,18 +68,21 @@ class Document extends Model {
         return (directory != null ? directory + '/' : '') + _id + '.' + ext;
     }
 
+    /// Is the file cached in local storage?
+    Future<bool> get isLocal => _localStore.exists(name);
+
     /// Get the storage model for reading and saving files.
-    StoreResource get store {
-        if (_store == null) {
-            _store = storageFactory();
+    EncryptableStoreResource get store {
+        if (_remoteStore == null) {
+            _remoteStore = storageFactory();
             if (encryptionKey != null && encryptionKey.isNotEmpty) {
-                _store.encryptionKey = encryptionKey;
+                _remoteStore.encryptionKey = encryptionKey;
             }
             else if (encryptionKey == null && Config.get('storage/encrypt')) {
-                encryptionKey = _store.generateKey();
+                encryptionKey = _remoteStore.generateKey();
             }
         }
-        return _store;
+        return _remoteStore;
     }
 
     /// Load the document from the file store.
@@ -91,7 +100,12 @@ class Document extends Model {
     }
 
     Stream<List<int>> streamContent() {
-        return store.read(name);
+        try {
+            // try and stream locally first
+            return _localStore.read(name);
+        } catch (e) {
+            return store.read(name);
+        }
     }
 
     /// Save the document to the file store.
@@ -102,6 +116,7 @@ class Document extends Model {
         _resizeImage();
         await store.ready();
         await super.save();
+        await _localStore.write(name, content);  // cache local copy
         return store.write(name, content, contentType: contentType);
     }
 
@@ -116,6 +131,7 @@ class Document extends Model {
         }
         if (await load()) {
             if (await store.delete(name)) {
+                _localStore.delete(name);  // clear local cache
                 return super.delete();
             }
             throw 'Error deleting document.';

@@ -12,6 +12,10 @@ import 'helper.dart';
 main() async {
     await initTestConfig();
 
+    tearDown(() async {
+        await storageFactory('local').purge();
+    });
+
     test('Constructors, getters and setters', () {
         var doc = new Document('abcdef');
         expect(doc.id, equals('abcdef'));
@@ -61,6 +65,7 @@ main() async {
             ..contentType = 'text/plain';
         var saveResult = await doc.save();
         expect(saveResult, isTrue);
+        expect(await doc.isLocal, isTrue);
         var newId = doc.id;
 
         // load
@@ -72,6 +77,7 @@ main() async {
         // delete
         var deleteResult = await doc.delete();
         expect(deleteResult, isTrue);
+        expect(await doc.isLocal, isFalse);
     });
 
     test('Loading non-existing documents', () async {

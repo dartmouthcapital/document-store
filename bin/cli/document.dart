@@ -1,15 +1,17 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
 import '../../lib/document.dart';
+import '../../lib/store/resource.dart';
 
 /// Top-level document command
 class DocumentCommand extends Command {
     final String name = 'document';
-    final String description = 'View and delete Document records.';
+    final String description = 'Manage Document records.';
 
     DocumentCommand() {
         addSubcommand(new InfoCommand());
         addSubcommand(new DeleteCommand());
+        addSubcommand(new PurgeCacheCommand());
     }
 }
 
@@ -66,6 +68,24 @@ class DeleteCommand extends Command {
         }
         else {
             print('Document "$id" does not exist.');
+            exit(1);
+        }
+    }
+}
+
+/// Command to delete a document
+class PurgeCacheCommand extends Command {
+    final String name = 'purge_cache';
+    final String description = 'Purge the Document cache.';
+
+    run() async {
+        StoreResource localStore = storageFactory('local');
+        if (await localStore.purge()) {
+            print('Local cache was successfully purged.');
+            exit(0);
+        }
+        else {
+            print('Could not purge the local cache.');
             exit(1);
         }
     }

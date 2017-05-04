@@ -11,7 +11,7 @@ import 'resource.dart';
 
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
-class GCloudStore implements StoreResource {
+class GCloudStore implements EncryptableStoreResource {
     static Map<String, Bucket> buckets = {};
     GCloudStoreClient _baseClient;
     AutoRefreshingAuthClient _apiClient;
@@ -52,6 +52,9 @@ class GCloudStore implements StoreResource {
             throw _handleException(e);
         }
     }
+
+    /// Purge all files from the store - not available
+    Future<bool> purge() => new Future.value(false);
 
     /// Authorize the app with Google
     Future<bool> ready() async {

@@ -4,6 +4,7 @@ import 'dart:io' show HttpStatus;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
 import 'package:test/test.dart';
+import '../lib/store/resource.dart';
 import '../lib/router.dart' as app;
 import '../lib/user.dart';
 import 'helper.dart';
@@ -17,13 +18,10 @@ main() async {
 
     const String username = 'tester';
     const String password = 'secret';
-    User tester = new User();
-    if (await tester.loadByUsername(username) == false) {
-        tester
-            ..username = username
-            ..password = password
-            ..save();
-    }
+    new User()
+        ..username = username
+        ..password = password
+        ..save();
 
     Request createRequest(String method, String path, {String body: '', Map headers: null}) {
         if (headers == null) {
@@ -40,6 +38,10 @@ main() async {
             headers: headers
         );
     }
+
+    tearDown(() async {
+        await storageFactory('local').purge();
+    });
 
     group('Testing authentication and OPTIONS', () {
         test('OPTIONS / 200', () async {
