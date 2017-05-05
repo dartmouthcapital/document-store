@@ -5,6 +5,7 @@ import 'resource.dart';
 /// Abstract model for interacting with the DB.
 abstract class Model {
     DbResource _resource;
+    DateTime created;
 
     /// Collection/table for interacting with the DB.
     String get collection;
@@ -47,6 +48,9 @@ abstract class Model {
             if (data.containsKey('id')) {
                 this.id = data['id'];
             }
+            if (data.containsKey('created')) {
+                created = DateTime.parse(data['created']);
+            }
             fromMap(data);
             return true;
         }
@@ -56,7 +60,12 @@ abstract class Model {
     /// Save the model to the DB.
     Future<bool> save() async {
         if (id == null) {  // insert
-            var newId = await resource.insert(toMap());
+            Map map = toMap();
+            if (!map.containsKey('created')) {
+                created = new DateTime.now();
+                map['created'] = created.toUtc().toIso8601String();
+            }
+            var newId = await resource.insert(map);
             if (newId != null) {
                 id = newId;
                 return true;

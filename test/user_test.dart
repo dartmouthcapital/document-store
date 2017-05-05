@@ -31,6 +31,8 @@ main() async {
         var saveResult = await user.save();
         expect(saveResult, isTrue);
         expect(user.isActive, isFalse);
+        expect(user.created, isNotNull);
+        expect(user.created.day, new DateTime.now().day);
         var newId = user.id;
 
         // load
