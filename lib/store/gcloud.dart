@@ -13,15 +13,12 @@ import 'resource.dart';
 /// See https://github.com/dart-lang/gcloud
 class GCloudStore implements EncryptableStoreResource {
     static Map<String, Bucket> buckets = {};
-    GCloudStoreClient _baseClient;
-    AutoRefreshingAuthClient _apiClient;
+    static GCloudStoreClient _client;
     String project;
     String bucketName;
     String accountCredentials;
 
-    GCloudStore(this.project, this.bucketName, this.accountCredentials) {
-        _baseClient = new GCloudStoreClient();
-    }
+    GCloudStore(this.project, this.bucketName, this.accountCredentials);
 
     /// Add a new object to the store
     Future<bool> write(String name, List<int> bytes, {String contentType}) async {
@@ -66,14 +63,14 @@ class GCloudStore implements EncryptableStoreResource {
         // Get an HTTP authenticated client using the service account credentials.
         var scopes = []
             ..addAll(Storage.SCOPES);
-        _apiClient = await clientViaServiceAccount(credentials, scopes, baseClient: _baseClient);
+        var apiClient = await clientViaServiceAccount(credentials, scopes, baseClient: client);
 
         // Instantiate objects to access Cloud Storage API.
         if (project == null || bucketName == null) {
             throw new BadRequestException({}, 'GCloud project and bucket name must be specified.');
         }
         try {
-            var storage = new Storage(_apiClient, project);
+            var storage = new Storage(apiClient, project);
             if (await storage.bucketExists(bucketName)) {
                 GCloudStore.buckets[bucketKey] = storage.bucket(bucketName);
                 return true;
@@ -88,21 +85,28 @@ class GCloudStore implements EncryptableStoreResource {
 
     /// Close the store connection
     void close() {
-        _baseClient.close();
-        _baseClient = null;
+        client.close();
+        _client = null;
     }
 
     Bucket get bucket => GCloudStore.buckets[project + '-' + bucketName];
 
+    GCloudStoreClient get client {
+        if (_client == null) {
+            _client = new GCloudStoreClient();
+        }
+        return _client;
+    }
+
     /// Returns the encryption key used, if available
-    String get encryptionKey => _baseClient.encryptionKey;
+    String get encryptionKey => client.encryptionKey;
 
     /// Set the encryption key to be used, if available
-    set encryptionKey(String key) => _baseClient.encryptionKey = key;
+    set encryptionKey(String key) => client.encryptionKey = key;
 
     /// Generate a new encryption key
     String generateKey() {
-        return _baseClient.generateKey();
+        return client.generateKey();
     }
 
     _handleException(e) {

@@ -75,10 +75,10 @@ class Document extends Model {
     EncryptableStoreResource get store {
         if (_remoteStore == null) {
             _remoteStore = storageFactory();
-            if (encryptionKey != null && encryptionKey.isNotEmpty) {
+            if (encryptionKey != null) {
                 _remoteStore.encryptionKey = encryptionKey;
             }
-            else if (encryptionKey == null && Config.get('storage/encrypt')) {
+            else if (Config.get('storage/encrypt')) {
                 encryptionKey = _remoteStore.generateKey();
             }
         }
