@@ -2,6 +2,8 @@
 server:
   host: "localhost"
   port: 8080
+  #ssl_certificate: "/path/to/cert.bundle"
+  #ssl_key: "/path/to/cert.key"
 
 db:
   adapter: "mongodb"

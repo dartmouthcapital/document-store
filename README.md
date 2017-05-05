@@ -6,11 +6,13 @@ A service for serving and storing documents from the Google Cloud.
 
 Copy `config.yaml.sample` as `config.yaml` and edit accordingly, and run `pub get`.
 
+If `ssl_certificate` and `ssl_key` are provided, a secure server will be started.
+
+Since documents are frequently accessed repeatedly, a local, cached version is stored. The cache can be cleared with a simple cron: `bin/cli.dart document purge_cache`
+
 ## Server
 
 Run `dart bin/server.dart` or to run in the background, `nohup dart bin/server.dart >> /var/log/dart.log 2>&1`
-
-Since documents are frequently accessed repeatedly, a local, cached version is stored. The cache can be cleared with a simple cron: `bin/cli.dart document purge_cache`
 
 Provide a Basic Auth header when connecting to the API.
 

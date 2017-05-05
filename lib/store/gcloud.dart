@@ -106,10 +106,7 @@ class GCloudStore implements EncryptableStoreResource {
     }
 
     _handleException(e) {
-        if (e is HttpException) {
-            return e;
-        }
-        else if (e is Error) {
+        if (e is HttpException || e is Error) {
             return e;
         }
         switch (e.status) {
