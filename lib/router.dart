@@ -13,11 +13,13 @@ Router appRouter = router(middleware: _authMw)
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
         if (await doc.load()) {
-            List<int> content = [];
-            await for (var bytes in doc.streamContent()) {
-                content.addAll(bytes);
+            try {
+                return new Response.ok(doc.streamContent(), headers: {'content-type': doc.contentType});
+            } on HttpException catch (e) { // ignore: conflicting_dart_import
+                throw e;
+            } catch (e) {
+                print(e);
             }
-            return new Response.ok(content, headers: {'content-type': doc.contentType});
         }
         throw new NotFoundException();
     })
