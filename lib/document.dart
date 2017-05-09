@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:image/image.dart';
 import 'config.dart';
 import 'db/model.dart';
@@ -99,12 +100,28 @@ class Document extends Model {
         return new Future.value(false);
     }
 
+    /// Stream file contents. The system first tries to load the file locally. If not available
+    /// locally, the remote store is accessed, and a local version is cached.
     Stream<List<int>> streamContent() {
         try {
-            // try and stream locally first
             return _localStore.read(name);
         } catch (e) {
-            return store.read(name);
+            IOSink writeSink = _localStore.writeSink(name);
+            Stream<List<int>> streamSave(Stream<List<int>> stream) async* {
+                await for (var data in stream) {
+                    writeSink.add(data);
+                    yield data;
+                }
+                writeSink.close();
+            }
+            try {
+                return streamSave(store.read(name));
+            } catch (f) {
+                writeSink.close().then((_) {
+                    _localStore.deleteSync(name);
+                });
+                throw f;
+            }
         }
     }
 

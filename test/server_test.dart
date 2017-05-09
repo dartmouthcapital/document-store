@@ -39,10 +39,6 @@ main() async {
         );
     }
 
-    tearDown(() async {
-        await storageFactory('local').purge();
-    });
-
     group('Testing authentication and OPTIONS', () {
         test('OPTIONS / 200', () async {
             Request request = createRequest('OPTIONS', '/');
@@ -127,6 +123,7 @@ main() async {
             expect(body.containsKey('content_type'), isTrue);
             expect(body['content_type'], equals('text/plain'));
             docId = body['id'];
+            await storageFactory('local').deleteSync(docId + '.txt');  // clear local cache
         });
 
         test('GET POST\'ed document', () async {
@@ -163,6 +160,7 @@ main() async {
             expect(body.containsKey('directory'), isTrue);
             expect(body['directory'], equals('subdir'));
             docId = body['id'];
+            await storageFactory('local').deleteSync(docId + '.txt');  // clear local cache
         });
 
         test('GET POST\'ed document', () async {
@@ -173,4 +171,6 @@ main() async {
             expect(body, equals('test file contents'));
         });
     });
+
+    await storageFactory('local').purge();
 }

@@ -38,12 +38,37 @@ class LocalStore extends StoreResource {
             .then((file) => true);
     }
 
+    /// Add a new object in stream form to the store
+    Future streamWrite(String name, Stream<List<int>> byteStream) async {
+        File file = _file(name);
+        IOSink output = file.openWrite();
+        await for (List<int> bytes in byteStream) {
+            output.add(bytes);
+        }
+        output.close();
+    }
+
+    /// Open a write sink for a given file
+    IOSink writeSink(String name) {
+        return _file(name).openWrite();
+    }
+
     /// Delete an object from the store
     Future<bool> delete(String name) {
         return _file(name)
             .delete()
             .then((fse) => true)
             .catchError((e) => false);
+    }
+
+    /// Delete an object from the store synchronously
+    bool deleteSync(String name) {
+        try {
+            _file(name).deleteSync();
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
     /// Returns when the store is ready to process
