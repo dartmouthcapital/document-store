@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http_exception/http_exception.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 import '../lib/config.dart';
@@ -141,6 +142,15 @@ main() async {
         image = decodeImage(doc.content);
         expect(image, isNotNull);
         expect(image.width, equals(500));
+    });
+
+    test('Bad image data is handled', () async {
+        List<int> bytes = UTF8.encode('test file contents');
+        Document doc = new Document()
+            ..content = bytes
+            ..contentType = 'image/jpeg';
+
+        expect(doc.save(), throwsA(new isInstanceOf<UnsupportedMediaTypeException>()));
     });
 
     test('Encryption', () async {

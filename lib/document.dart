@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:http_exception/http_exception.dart';
 import 'package:image/image.dart';
 import 'config.dart';
 import 'db/model.dart';
@@ -171,18 +172,22 @@ class Document extends Model {
         var maxWidth = Config.get('storage/resize_max_width');
         if (_canResize() && maxWidth is int && maxWidth > 0) {
             Image original;
-            switch (contentType) {
-                case 'image/png':
-                    original = new PngDecoder().decodeImage(content);
-                    break;
-                case 'image/jpeg':
-                    original = new JpegDecoder().decodeImage(content);
-                    break;
-                case 'image/gif':
-                    original = new GifDecoder().decodeImage(content);
-                    break;
-                default:
-                    original = decodeImage(content);
+            try {
+                switch (contentType) {
+                    case 'image/png':
+                        original = new PngDecoder().decodeImage(content);
+                        break;
+                    case 'image/jpeg':
+                        original = new JpegDecoder().decodeImage(content);
+                        break;
+                    case 'image/gif':
+                        original = new GifDecoder().decodeImage(content);
+                        break;
+                    default:
+                        original = decodeImage(content);
+                }
+            } catch (e) {
+                throw new UnsupportedMediaTypeException();
             }
             if (original != null && original.width > maxWidth) {
                 Image resized = copyResize(original, maxWidth);
