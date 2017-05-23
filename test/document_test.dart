@@ -132,7 +132,7 @@ main() async {
         expect(image, isNotNull);
         expect(image.width, equals(300));
 
-        // large image, resize
+        // large width image, resize
         imageData = new File('test/documents/test_x768.jpg').readAsBytesSync();
         doc = new Document()
             ..content = imageData
@@ -142,6 +142,17 @@ main() async {
         image = decodeImage(doc.content);
         expect(image, isNotNull);
         expect(image.width, equals(500));
+
+        // large height image, resize
+        imageData = new File('test/documents/test_x768h.jpg').readAsBytesSync();
+        doc = new Document()
+            ..content = imageData
+            ..contentType = 'image/jpeg';
+
+        await doc.save();
+        image = decodeImage(doc.content);
+        expect(image, isNotNull);
+        expect(image.height, equals(500));
     });
 
     test('Bad image data is handled', () async {

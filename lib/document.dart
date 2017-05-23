@@ -189,8 +189,17 @@ class Document extends Model {
             } catch (e) {
                 throw new UnsupportedMediaTypeException();
             }
-            if (original != null && original.width > maxWidth) {
-                Image resized = copyResize(original, maxWidth);
+            if (original.width > maxWidth || original.height > maxWidth) {
+                int newWidth, newHeight;
+                if (original.width >= original.height) {
+                    newWidth = maxWidth;
+                    newHeight = -1;
+                }
+                else {
+                    newWidth = (maxWidth * (original.height / original.width)).toInt();
+                    newHeight = maxWidth;
+                }
+                Image resized = copyResize(original, newWidth, newHeight);
                 switch (contentType) {
                     case 'image/png':
                         content = encodePng(resized);
