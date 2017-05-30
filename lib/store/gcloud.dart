@@ -113,18 +113,20 @@ class GCloudStore implements EncryptableStoreResource {
         if (e is HttpException || e is Error) {
             return e;
         }
-        switch (e.status) {
-            case 400:
-                return new BadRequestException();
-            case 403:
-                return new ForbiddenException();
-            case 404:
-                return new NotFoundException();
-            case 405:
-                return new MethodNotAllowed();
-            default:
-                return e;
-        }
+        try {
+            switch (e.status) {
+                case 400:
+                    return new BadRequestException();
+                case 403:
+                    return new ForbiddenException();
+                case 404:
+                    return new NotFoundException();
+                case 405:
+                    return new MethodNotAllowed();
+            }
+        } catch (f) {}  // e.status doesn't exist
+
+        return e;
     }
 }
 
