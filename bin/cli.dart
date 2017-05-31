@@ -1,12 +1,12 @@
 #!/usr/bin/env dart
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import '../lib/config.dart';
+import '../lib/app.dart';
 import 'cli/document.dart';
 import 'cli/user.dart';
 
 main(List<String> args) async {
-    await Config.ready();
+    await bootstrap();
 
     var runner = new CommandRunner('ds-cli', 'Document Store CLI')
         ..addCommand(new DocumentCommand())

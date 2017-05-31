@@ -96,7 +96,7 @@ class Document extends Model {
             if (encryptionKey.isEmpty) {  // document isn't encrypted
                 store.encryptionKey = '';
             }
-            return store.ready();
+            return true;
         }
         return false;
     }
@@ -132,7 +132,6 @@ class Document extends Model {
             throw 'Document content has not been set.';
         }
         _resizeImage();
-        await store.ready();
         await super.save();
         await _localStore.write(name, content);  // cache local copy
         return store.write(name, content, contentType: contentType);

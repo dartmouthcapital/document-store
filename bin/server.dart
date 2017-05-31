@@ -5,19 +5,20 @@ import 'package:shelf/shelf_io.dart' show serveRequests;
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
 import 'package:shelf_route/shelf_route.dart';
 
+import '../lib/app.dart' as app;
 import '../lib/config.dart';
-import '../lib/router.dart' as app;
+import '../lib/router.dart' as appRouter;
 
 main(List<String> args) async {
-    await Config.ready();
+    await app.bootstrap();
 
     Handler handler = const Pipeline()
         .addMiddleware(exceptionHandler())
         .addMiddleware(logRequests())
-        .addMiddleware(app.appMiddleware)
-        .addHandler(app.appRouter.handler);
+        .addMiddleware(appRouter.appMiddleware)
+        .addHandler(appRouter.appRouter.handler);
 
-    printRoutes(app.appRouter);
+    printRoutes(appRouter.appRouter);
 
     try {
         HttpServer server;
