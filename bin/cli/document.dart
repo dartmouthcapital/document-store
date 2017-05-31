@@ -79,7 +79,7 @@ class PurgeCacheCommand extends Command {
     final String description = 'Purge the Document cache.';
 
     run() async {
-        StoreResource localStore = storageFactory('local');
+        StoreResource localStore = new StoreResource('local');
         if (await localStore.purge()) {
             print('Local cache was successfully purged.');
             exit(0);

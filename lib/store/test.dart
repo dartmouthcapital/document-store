@@ -8,7 +8,7 @@ import 'resource.dart';
 const String testEncryptionKey = '0PkKJMC0TR6Erq1KE19NLLeNhtwMyaw3vox1eIXmyUs=';
 
 /// Test storage adapter
-class TestStore implements StoreResource {
+class TestStore extends EncryptableStoreResource {
     String encryptionKey = testEncryptionKey;
 
     /// Fetch an object from the store

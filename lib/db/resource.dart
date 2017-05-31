@@ -4,6 +4,20 @@ import 'resource/mongo.dart';
 
 /// Base resource model
 abstract class DbResource {
+    /// DB factory
+    factory DbResource([Map customParams]) {
+        var resource = new MongoResource(
+            Config.get('db/mongodb/db_name'),
+            Config.get('db/mongodb/uri'),
+            Config.get('db/mongodb/pool_size'),
+            auth: Config.get('db/mongodb/auth')
+        );
+        if (customParams.containsKey('collection')) {
+            resource.collectionName = customParams['collection'];
+        }
+        return resource;
+    }
+
     /// Insert a new object into the store.
     Future<String> insert(Map data);
 
@@ -24,18 +38,4 @@ abstract class DbResource {
 
     /// Delete all objects from a collection.
     Future<bool> truncate();
-}
-
-// The only available resource type, at this point.
-DbResource resourceFactory([Map customParams]) {
-    var resource = new MongoResource(
-        Config.get('db/mongodb/db_name'),
-        Config.get('db/mongodb/uri'),
-        Config.get('db/mongodb/pool_size'),
-        auth: Config.get('db/mongodb/auth')
-    );
-    if (customParams.containsKey('collection')) {
-        resource.collectionName = customParams['collection'];
-    }
-    return resource;
 }

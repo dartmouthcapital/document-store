@@ -19,7 +19,7 @@ class Document extends Model {
     LocalStore _localStore;
 
     Document([this._id]) {
-        _localStore = storageFactory('local');
+        _localStore = new StoreResource('local');
     }
 
     Document.fromJson(Map json) :
@@ -27,7 +27,7 @@ class Document extends Model {
             this.contentType = json['content_type'],
             this.directory = json['directory'],
             this.encryptionKey = json.containsKey('encryption_key') ? json['encryption_key'] : '' {
-        _localStore = storageFactory('local');
+        _localStore = new StoreResource('local');
     }
 
     /// Prepare the model for saving in the DB.
@@ -76,7 +76,7 @@ class Document extends Model {
     /// Get the storage model for reading and saving files.
     EncryptableStoreResource get store {
         if (_remoteStore == null) {
-            _remoteStore = storageFactory();
+            _remoteStore = new StoreResource();
             if (encryptionKey != null) {
                 _remoteStore.encryptionKey = encryptionKey;
             }
@@ -98,7 +98,7 @@ class Document extends Model {
             }
             return store.ready();
         }
-        return new Future.value(false);
+        return false;
     }
 
     /// Stream file contents. The system first tries to load the file locally. If not available
@@ -154,7 +154,7 @@ class Document extends Model {
             }
             throw 'Error deleting document.';
         }
-        return new Future.value(false);
+        return false;
     }
 
     bool _canResize () {

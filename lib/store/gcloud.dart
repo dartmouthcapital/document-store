@@ -11,7 +11,7 @@ import 'resource.dart';
 
 /// Google Cloud storage class
 /// See https://github.com/dart-lang/gcloud
-class GCloudStore implements EncryptableStoreResource {
+class GCloudStore extends EncryptableStoreResource {
     static Map<String, Bucket> buckets = {};
     static GCloudStoreClient _client;
     String project;

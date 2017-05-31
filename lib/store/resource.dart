@@ -7,6 +7,25 @@ import '../config.dart';
 
 /// Abstract file store
 abstract class StoreResource {
+    /// Storage factory
+    factory StoreResource([String type = null]) {
+        String adapter = type ?? Config.get('storage/adapter');
+        switch (adapter) {
+            case 'test':
+                return new TestGCloudStore();
+            case 'local':
+                return new LocalStore(Config.tempPath + Platform.pathSeparator + 'doc_cache');
+            case 'remote':
+            case 'gcloud':
+            default:
+                return new GCloudStore(
+                    Config.get('gcloud/project'),
+                    Config.get('gcloud/bucket'),
+                    Config.get('gcloud/service_account')
+                );
+        }
+    }
+
     /// Fetch an object from the store
     Stream<List<int>> read(String name);
 
@@ -24,28 +43,9 @@ abstract class StoreResource {
 }
 
 /// File store that supports encryption
-abstract class EncryptableStoreResource extends StoreResource {
+abstract class EncryptableStoreResource implements StoreResource {
     String encryptionKey;
 
     /// Generate a new encryption key
     String generateKey();
-}
-
-// Instantiate a new storage factory.
-StoreResource storageFactory([String type = null]) {
-    String adapter = type ?? Config.get('storage/adapter');
-    switch (adapter) {
-        case 'test':
-            return new TestGCloudStore();
-        case 'local':
-            return new LocalStore(Config.tempPath + Platform.pathSeparator + 'doc_cache');
-        case 'remote':
-        case 'gcloud':
-        default:
-            return new GCloudStore(
-                Config.get('gcloud/project'),
-                Config.get('gcloud/bucket'),
-                Config.get('gcloud/service_account')
-            );
-    }
 }

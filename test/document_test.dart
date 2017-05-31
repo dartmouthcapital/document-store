@@ -14,7 +14,7 @@ main() async {
     await initTestConfig();
 
     tearDown(() async {
-        await storageFactory('local').purge();
+        await new StoreResource('local').purge();
     });
 
     test('Constructors, getters and setters', () {

@@ -9,9 +9,9 @@ main() async {
     await initTestConfig();
 
     test('Storage factory', () {
-        expect(storageFactory() is GCloudStore, isTrue);
-        expect(storageFactory('gcloud') is GCloudStore, isTrue);
-        expect(storageFactory('test') is TestGCloudStore, isTrue);
-        expect(storageFactory('local') is LocalStore, isTrue);
+        expect(new StoreResource() is GCloudStore, isTrue);
+        expect(new StoreResource('gcloud') is GCloudStore, isTrue);
+        expect(new StoreResource('test') is TestGCloudStore, isTrue);
+        expect(new StoreResource('local') is LocalStore, isTrue);
     });
 }

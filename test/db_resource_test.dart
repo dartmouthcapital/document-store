@@ -4,7 +4,7 @@ import 'helper.dart';
 
 main() async {
     await initTestConfig();
-    var resource = resourceFactory({'collection': 'test'}),
+    var resource = new DbResource({'collection': 'test'}),
         id;
 
     test('Item was inserted', () async {

@@ -123,7 +123,7 @@ main() async {
             expect(body.containsKey('content_type'), isTrue);
             expect(body['content_type'], equals('text/plain'));
             docId = body['id'];
-            await storageFactory('local').deleteSync(docId + '.txt');  // clear local cache
+            await new StoreResource('local').deleteSync(docId + '.txt');  // clear local cache
         });
 
         test('GET POST\'ed document', () async {
@@ -160,7 +160,7 @@ main() async {
             expect(body.containsKey('directory'), isTrue);
             expect(body['directory'], equals('subdir'));
             docId = body['id'];
-            await storageFactory('local').deleteSync(docId + '.txt');  // clear local cache
+            await new StoreResource('local').deleteSync(docId + '.txt');  // clear local cache
         });
 
         test('GET POST\'ed document', () async {
@@ -172,5 +172,5 @@ main() async {
         });
     });
 
-    await storageFactory('local').purge();
+    await new StoreResource('local').purge();
 }

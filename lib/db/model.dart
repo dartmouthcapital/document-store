@@ -17,7 +17,7 @@ abstract class Model {
     /// Get the resource model for interacting with the DB.
     DbResource get resource {
         if (_resource == null) {
-            _resource = resourceFactory({'collection': collection});
+            _resource = new DbResource({'collection': collection});
         }
         return _resource;
     }

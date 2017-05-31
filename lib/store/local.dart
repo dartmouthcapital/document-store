@@ -3,7 +3,7 @@ import 'dart:io';
 import 'resource.dart';
 
 /// Local, file system storage class
-class LocalStore extends StoreResource {
+class LocalStore implements StoreResource {
     String filePath;
     Directory _storageDirectory;
 
@@ -54,21 +54,26 @@ class LocalStore extends StoreResource {
     }
 
     /// Delete an object from the store
-    Future<bool> delete(String name) {
-        return _file(name)
-            .delete()
-            .then((fse) => true)
-            .catchError((e) => false);
+    Future<bool> delete(String name) async {
+        File file = _file(name);
+        if (await file.exists()) {
+            return file.delete()
+                .then((fse) => true)
+                .catchError((e) => false);
+        }
+        return false;
     }
 
     /// Delete an object from the store synchronously
     bool deleteSync(String name) {
-        try {
-            _file(name).deleteSync();
-            return true;
-        } catch (e) {
-            return false;
+        File file = _file(name);
+        if (file.existsSync()) {
+            try {
+                file.deleteSync();
+                return true;
+            } catch (e) {}
         }
+        return false;
     }
 
     /// Returns when the store is ready to process
