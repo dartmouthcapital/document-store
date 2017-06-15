@@ -74,6 +74,7 @@ main() async {
         var loadResult = await doc.load();
         expect(loadResult, isTrue);
         expect(doc.contentType, equals('text/plain'));
+        expect(doc.encryptionKey, isNotEmpty);
 
         // delete
         var deleteResult = await doc.delete();
@@ -106,7 +107,7 @@ main() async {
         expect(doc.contentType, equals('application/json'));
 
         doc = new Document();
-        expect(doc.save(), throwsA(equals('Document content has not been set.')));
+        expect(doc.save(), throwsA(equals('Document content has not been set.')));  // await implied
     });
 
     test('Deleting non-existing documents and invalid deletes', () async {
@@ -115,7 +116,7 @@ main() async {
         expect(result, isFalse);
 
         doc = new Document();
-        expect(doc.delete(), throwsA(equals('Cannot delete file without an ID.')));
+        expect(doc.delete(), throwsA(equals('Cannot delete file without an ID.')));  // await implied
     });
 
     test('Images are correctly resized', () async {

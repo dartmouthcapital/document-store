@@ -132,9 +132,15 @@ class Document extends Model {
             throw 'Document content has not been set.';
         }
         _resizeImage();
+        store;  // make sure the store is initialized (ie. encryption key generated)
         await super.save();
-        await _localStore.write(name, content);  // cache local copy
-        return store.write(name, content, contentType: contentType);
+        try {
+            await _localStore.write(name, content);  // cache local copy
+            return store.write(name, content, contentType: contentType);
+        } catch (e) {
+            await super.delete();
+            throw e;
+        }
     }
 
     /// Delete the document from the file store.
