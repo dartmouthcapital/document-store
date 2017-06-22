@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import '../../lib/user.dart';
+import '../user.dart';
 
 /// Top-level user command
 class UserCommand extends Command {

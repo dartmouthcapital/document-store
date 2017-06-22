@@ -2,8 +2,8 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
 import '../lib/app.dart';
-import 'cli/document.dart';
-import 'cli/user.dart';
+import '../lib/cli/document.dart';
+import '../lib/cli/user.dart';
 
 main(List<String> args) async {
     await bootstrap();

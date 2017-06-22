@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import '../../lib/document.dart';
-import '../../lib/store/resource.dart';
+import '../document.dart';
+import '../store/resource.dart';
 
 /// Top-level document command
 class DocumentCommand extends Command {
