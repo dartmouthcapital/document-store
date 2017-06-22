@@ -26,7 +26,13 @@ class Config {
     }
 
     /// Get a field from the config.
+    /// Environment variables will be searched first.
     static get(String key) {
+        String env = key.replaceAll('/', '_').toUpperCase();
+        if (Platform.environment.containsKey(env)) {
+            return Platform.environment[env];
+        }
+
         var parts = key.split('/'),
             last = parts.removeLast(),
             instance = new Config(),

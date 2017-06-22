@@ -19,6 +19,10 @@ main() async {
         expect(Config.get('bogus_map/bogus_key'), equals(null));
     });
 
+    test('get from ENV', () {
+        expect(Config.get('path'), isNotEmpty);
+    });
+
     test('set', () {
         Config.set('new_key', 'new_value');
         expect(Config.get('new_key'), equals('new_value'));
