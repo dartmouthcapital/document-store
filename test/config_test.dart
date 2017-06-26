@@ -1,15 +1,10 @@
 // Config class test suite
-import 'package:dart_config/default_server.dart';
 import 'package:test/test.dart';
 import '../lib/config.dart';
+import 'helper.dart';
 
 main() async {
-    Map baseConfig = await loadConfig('test/config.yaml');
-    Map testConfig = await loadConfig('test/configs/config_test.yaml');
-    Map allConfig = new Map()
-        ..addAll(baseConfig)
-        ..addAll(testConfig);
-    new Config(allConfig);  // initialize the config
+    await initTestConfig('test/configs/config_test.yaml');
 
     test('get', () {
         expect(Config.get('test_key'), equals('test_value'));
@@ -17,6 +12,10 @@ main() async {
         expect(Config.get('test_map/test_key2/test_sub_key'), equals('test_sub_value'));
         expect(Config.get('bogus_key'), equals(null));
         expect(Config.get('bogus_map/bogus_key'), equals(null));
+    });
+
+    test('get defaults', () {
+        expect(Config.get('db/adapter'), equals('mongodb'));
     });
 
     test('get from ENV', () {

@@ -11,6 +11,7 @@ dependencies:
   connection_pool:
   crypto:
   dart_config:
+  dart_ext:
   dbcrypt:
   gcloud:
   googleapis_auth:

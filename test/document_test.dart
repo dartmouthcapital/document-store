@@ -120,8 +120,6 @@ main() async {
     });
 
     test('Images are correctly resized', () async {
-        //Config.set('storage/resize_max_width', 500);
-
         // small image, don't resize
         var imageData = new File('test/documents/test_x300.jpg').readAsBytesSync();
         Document doc = new Document()

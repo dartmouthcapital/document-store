@@ -1,0 +1,28 @@
+# document-store default configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  #ssl_certificate: "/path/to/cert.bundle"
+  #ssl_key: "/path/to/cert.key"
+
+db:
+  adapter: "mongodb"
+  mongodb:
+    #db_name: "db-name"
+    uri: "mongodb://127.0.0.1/"
+    pool_size: 8
+    #auth:  # optional
+    #  username: "user"
+    #  password: "secret"
+    #  source: "admin" # if the auth DB is different from the main DB
+
+storage:
+  adapter: "gcloud"
+  resize_max_width: 900
+  encrypt: true
+
+gcloud:
+  #project: "project"
+  #bucket: "bucket"
+  #service_account: >-
+  #  { ... }

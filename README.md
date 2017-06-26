@@ -4,7 +4,7 @@ A service for serving and storing documents from the Google Cloud.
 
 ## Installation + Configuration
 
-Copy `config.yaml.sample` as `config.yaml` and edit accordingly, and run `pub get`.
+Override any default configuration from `config_default.yaml`, save to `config.yaml`, and run `pub get`.
 
 If `ssl_certificate` and `ssl_key` are provided, a secure server will be started.
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dart_config/default_server.dart';
+import 'package:dart_ext/collection_ext.dart' show merge;
 
 /// Singleton config class
 class Config {
@@ -20,9 +21,11 @@ class Config {
     Config._internal(this._config);
 
     /// Initialize the config.
-    static Future ready([String configFile = 'config.yaml']) async {
-        Map configMap = await loadConfig(configFile);
-        new Config(configMap);  // initialize the config
+    static Future ready([Map overrides = null]) async {
+        Map defaultConfig = await loadConfig('config_default.yaml');
+        Map localConfig = await loadConfig('config.yaml');
+        Map merged = merge(defaultConfig, localConfig);
+        new Config(merge(merged, overrides));  // initialize the config
     }
 
     /// Get a field from the config.
@@ -46,7 +49,7 @@ class Config {
                 return null;
             }
         }
-        if (map.containsKey(last)) {
+        if (map != null && map.containsKey(last)) {
             return map[last];
         }
         return null;
