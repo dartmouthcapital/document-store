@@ -201,7 +201,7 @@ class Document extends Model {
                     newHeight = -1;
                 }
                 else {
-                    newWidth = (maxWidth * (original.height / original.width)).toInt();
+                    newWidth = (maxWidth * (original.width / original.height)).toInt();
                     newHeight = maxWidth;
                 }
                 Image resized = copyResize(original, newWidth, newHeight);

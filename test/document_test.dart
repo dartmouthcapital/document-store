@@ -154,6 +154,7 @@ main() async {
         image = decodeImage(doc.content);
         expect(image, isNotNull);
         expect(image.height, equals(500));
+        expect(image.height > image.width, isTrue);
     });
 
     test('Bad image data is handled', () async {
