@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dart_config/default_server.dart';
 import 'package:dart_ext/collection_ext.dart' show merge;
 import '../lib/config.dart';
 
 Future initTestConfig([String additionalFile = null]) async {
-    Map testConfig = await loadConfig('test/config.yaml');
+    File testFile = new File('test/config.yaml');
+    Map testConfig = testFile.existsSync() ? await loadConfig('test/config.yaml') : {};
     if (additionalFile != null) {
         Map additionalConfig = await loadConfig(additionalFile);
         testConfig = merge(testConfig, additionalConfig);

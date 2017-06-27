@@ -23,7 +23,8 @@ class Config {
     /// Initialize the config.
     static Future ready([Map overrides = null]) async {
         Map defaultConfig = await loadConfig('config_default.yaml');
-        Map localConfig = await loadConfig('config.yaml');
+        File localFile = new File('config.yaml');
+        Map localConfig = localFile.existsSync() ? await loadConfig('config.yaml') : {};
         Map merged = merge(defaultConfig, localConfig);
         new Config(merge(merged, overrides));  // initialize the config
     }

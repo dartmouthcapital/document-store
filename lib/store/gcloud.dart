@@ -55,6 +55,9 @@ class GCloudStore extends EncryptableStoreResource {
 
     /// Authorize the app with Google
     Future<bool> ready() async {
+        if (project == null || bucketName == null) {
+            throw new GCloudException('Both project and bucket name must be specified.');
+        }
         var bucketKey = project + '-' + bucketName;
         if (GCloudStore.buckets.containsKey(bucketKey)) {
             return new Future.value(true);
@@ -217,5 +220,19 @@ class EncryptionKey {
         for (var i = 0; i < length; i++) {
             _key[i] = generator.nextInt(256);
         }
+    }
+}
+
+class GCloudException implements Exception
+{
+    final message;
+
+    GCloudException([this.message]);
+
+    String toString() {
+        if (message == null) {
+            return 'GCloudException';
+        }
+        return 'GCloudException: $message';
     }
 }
