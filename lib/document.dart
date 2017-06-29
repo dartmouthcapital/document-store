@@ -177,19 +177,22 @@ class Document extends Model {
         var maxWidth = Config.get('storage/resize_max_width');
         if (_canResize() && maxWidth is int && maxWidth > 0) {
             Image original;
+            // Until https://github.com/brendan-duncan/image/issues/41 is fixed, 8-bit PNGs are
+            // corrupted by the images package. Clone the content here so it's not affected.
+            List<int> imageData = new List.from(content);
             try {
                 switch (contentType) {
                     case 'image/png':
-                        original = new PngDecoder().decodeImage(content);
+                        original = new PngDecoder().decodeImage(imageData);
                         break;
                     case 'image/jpeg':
-                        original = new JpegDecoder().decodeImage(content);
+                        original = new JpegDecoder().decodeImage(imageData);
                         break;
                     case 'image/gif':
-                        original = new GifDecoder().decodeImage(content);
+                        original = new GifDecoder().decodeImage(imageData);
                         break;
                     default:
-                        original = decodeImage(content);
+                        original = decodeImage(imageData);
                 }
             } catch (e) {
                 throw new UnsupportedMediaTypeException();
@@ -207,7 +210,10 @@ class Document extends Model {
                 Image resized = copyResize(original, newWidth, newHeight);
                 switch (contentType) {
                     case 'image/png':
-                        content = encodePng(resized);
+                        // see above - don't encode 8-bit PNGs
+                        if (!(content[24] == 8 && content[25] == 3)) {
+                            content = encodePng(resized);
+                        }
                         break;
                     case 'image/jpeg':
                         content = encodeJpg(resized, quality: 90);
