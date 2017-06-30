@@ -1,11 +1,10 @@
+.git/
+.gitignore
 .idea/
 .packages
 .pub/
 bin/test.dart
-build/
+config.yaml
 docker/
-/config.yaml
-/test/config.yaml
 pubspec.lock
-doc/api/
-/var
+var/

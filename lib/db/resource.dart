@@ -39,3 +39,17 @@ abstract class DbResource {
     /// Delete all objects from a collection.
     Future<bool> truncate();
 }
+
+class DbResourceException implements Exception
+{
+    final message;
+
+    DbResourceException([this.message]);
+
+    String toString() {
+        if (message == null) {
+            return 'DbResourceException';
+        }
+        return 'DbResourceException: $message';
+    }
+}

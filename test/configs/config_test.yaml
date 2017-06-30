@@ -4,3 +4,6 @@ test_map:
   test_key1: "test_value1"
   test_key2:
     test_sub_key: "test_sub_value"
+
+override: "read from config"
+override_file: "test/configs/override.txt"

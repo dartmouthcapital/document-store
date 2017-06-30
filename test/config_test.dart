@@ -22,6 +22,11 @@ main() async {
         expect(Config.get('path'), isNotEmpty);
     });
 
+    test('getFile', () {
+        expect(Config.getFile('test_key'), equals('test_value'));
+        expect(Config.getFile('override'), equals('read from file'));
+    });
+
     test('set', () {
         Config.set('new_key', 'new_value');
         expect(Config.get('new_key'), equals('new_value'));

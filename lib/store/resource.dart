@@ -19,9 +19,9 @@ abstract class StoreResource {
             case 'gcloud':
             default:
                 return new GCloudStore(
-                    Config.get('gcloud/project'),
-                    Config.get('gcloud/bucket'),
-                    Config.get('gcloud/service_account')
+                    Config.getFile('gcloud/project'),
+                    Config.getFile('gcloud/bucket'),
+                    Config.getFile('gcloud/service_account')
                 );
         }
     }

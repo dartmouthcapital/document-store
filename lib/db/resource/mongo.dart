@@ -9,10 +9,13 @@ class MongoResource implements DbResource {
     String collectionName;
 
     MongoResource(String databaseName, String databaseUrl, int databasePoolSize, {Map auth, String collection}) {
+        if (databaseName == null || databaseUrl == null) {
+            throw new DbResourceException('Both database name and URL must be specified.');
+        }
         if (_pool == null) {
             _pool = new MongoPool(
                 databaseUrl + databaseName,
-                databasePoolSize,
+                databasePoolSize ?? 4,
                 auth != null ? auth['username'] : null,
                 auth != null ? auth['password'] : null,
                 auth != null ? auth['source'] : null

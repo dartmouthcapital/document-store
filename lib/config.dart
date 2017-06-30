@@ -56,6 +56,15 @@ class Config {
         return null;
     }
 
+    /// Get a field from the config, but first try to pull its value from a file, assuming the file
+    /// path is also in the config, appended with "_file".
+    static getFile(String key) {
+        String filePath = Config.get(key + '_file');
+        return filePath != null
+            ? new File(filePath).readAsStringSync()
+            : Config.get(key);
+    }
+
     /// Set a field in the config.
     static set(String key, value) {
         var parts = key.split('/'),

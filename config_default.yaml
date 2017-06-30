@@ -8,7 +8,7 @@ server:
 db:
   adapter: "mongodb"
   mongodb:
-    #db_name: "db-name"
+    db_name: "documents"
     uri: "mongodb://127.0.0.1/"
     pool_size: 8
     #auth:  # optional
@@ -26,3 +26,7 @@ gcloud:
   #bucket: "bucket"
   #service_account: >-
   #  { ... }
+  # OR
+  #project_file: docker/gcloud_project.txt
+  #bucket_file: docker/gcloud_bucket.txt
+  #service_account_file: docker/gcloud_service_account.json
