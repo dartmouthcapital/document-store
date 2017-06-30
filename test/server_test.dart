@@ -23,11 +23,11 @@ main() async {
         ..password = password
         ..save();
 
-    Request createRequest(String method, String path, {String body: '', Map headers: null}) {
+    Request createRequest(String method, String path, {String body: '', Map headers: null, bool noAuth: false}) {
         if (headers == null) {
             headers = {};
         }
-        if (!headers.containsKey('Authorization')) {
+        if (!headers.containsKey('Authorization') && !noAuth) {
             headers['Authorization'] =
                 'Basic ' + BASE64.encode(UTF8.encode(username + ':' + password));
         }
@@ -46,15 +46,35 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
         });
 
-        test('OPTIONS / 400', () async {
-            Request request = createRequest('OPTIONS', '/', headers: {'Authorization': 'badauth'});
+        test('OPTIONS / 200 (no auth)', () async {
+            Request request = createRequest('OPTIONS', '/', noAuth: true);
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+        });
+    });
+
+    group('Testing authentication failure', () {
+        test('GET / 400', () async {
+            Request request = createRequest('GET', '/abc', headers: {'Authorization': 'badauth'});
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.BAD_REQUEST));
         });
 
-        test('OPTIONS / 401', () async {
-            String auth = 'Basic ' + BASE64.encode(UTF8.encode('test:nevermatch'));
-            Request request = createRequest('OPTIONS', '/', headers: {'Authorization': auth});
+        String auth = 'Basic ' + BASE64.encode(UTF8.encode('test:nevermatch'));
+        test('GET / 401', () async {
+            Request request = createRequest('GET', '/abc', headers: {'Authorization': auth});
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
+        });
+
+        test('POST / 401', () async {
+            Request request = createRequest('POST', '/', headers: {'Authorization': auth});
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
+        });
+
+        test('DELETE / 401', () async {
+            Request request = createRequest('DELETE', '/abc', headers: {'Authorization': auth});
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
         });

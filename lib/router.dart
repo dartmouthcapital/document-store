@@ -8,7 +8,7 @@ import 'package:shelf_route/shelf_route.dart';
 import 'document.dart';
 import 'user.dart';
 
-Router appRouter = router(middleware: _authMw)
+Router appRouter = router()
     ..get('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
@@ -22,7 +22,7 @@ Router appRouter = router(middleware: _authMw)
             }
         }
         throw new NotFoundException();
-    })
+    }, middleware: _authMw)
     ..post('/{?directory}', (Request request) async {
         var bin = new BytesBuilder(),
             contentType = request.mimeType,
@@ -42,7 +42,7 @@ Router appRouter = router(middleware: _authMw)
             return new Response.ok(doc.toJson(), headers: {'content-type': 'application/json'});
         }
         throw new HttpException(); // ignore: conflicting_dart_import
-    })
+    }, middleware: _authMw)
     ..delete('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
@@ -50,7 +50,7 @@ Router appRouter = router(middleware: _authMw)
             return new Response.ok('Document deleted.');
         }
         throw new NotFoundException();
-    })
+    }, middleware: _authMw)
     ..add('/', ['OPTIONS'], (Request request) {
         return new Response.ok(null, headers: CORSHeader);
     });
