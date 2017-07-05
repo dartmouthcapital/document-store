@@ -44,6 +44,7 @@ main() async {
             Request request = createRequest('OPTIONS', '/');
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.OK));
+            expect(await response.readAsString(), equals('Ok'));
         });
 
         test('OPTIONS / 200 (no auth)', () async {
@@ -143,6 +144,7 @@ main() async {
             expect(body.containsKey('content_type'), isTrue);
             expect(body['content_type'], equals('text/plain'));
             docId = body['id'];
+            assert(docId != null);
             await new StoreResource('local').deleteSync(docId + '.txt');  // clear local cache
         });
 

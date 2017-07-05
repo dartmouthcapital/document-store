@@ -52,7 +52,7 @@ Router appRouter = router()
         throw new NotFoundException();
     }, middleware: _authMw)
     ..add('/', ['OPTIONS'], (Request request) {
-        return new Response.ok(null, headers: CORSHeader);
+        return new Response.ok('Ok', headers: CORSHeader);
     });
 
 Middleware _authMw = authenticate(

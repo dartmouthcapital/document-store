@@ -1,2 +1,4 @@
-# tmannherz/document-store
+# tmannherz/doc-store-base
 FROM google/dart-runtime
+
+COPY .* /app/
