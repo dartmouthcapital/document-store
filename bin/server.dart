@@ -1,5 +1,6 @@
 #!/usr/bin/env dart
 import 'dart:io';
+import 'package:cron/cron.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' show serveRequests;
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
@@ -8,6 +9,7 @@ import 'package:shelf_route/shelf_route.dart';
 import '../lib/app.dart' as app;
 import '../lib/config.dart';
 import '../lib/router.dart' as appRouter;
+import '../lib/store/resource.dart';
 
 main(List<String> args) async {
     await app.bootstrap();
@@ -43,4 +45,17 @@ main(List<String> args) async {
         print(error);
         print(stackTrace);
     }
+
+    // local cache purge
+    var cron = new Cron();
+    cron.schedule(new Schedule.parse('0 6 * * *'), () async {
+        try {
+            StoreResource localStore = new StoreResource('local');
+            await localStore.purge() ?
+                print('Local cache was successfully purged.') :
+                print('Could not purge the local cache.');
+        } catch (error) {
+            print('Error running the cron: ' + error.toString());
+        }
+    });
 }

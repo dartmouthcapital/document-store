@@ -7,4 +7,4 @@ bin/test.dart
 config.yaml
 docker/
 pubspec.lock
-var/
+var/*

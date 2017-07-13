@@ -1,16 +1,11 @@
 version: '3.1'
 
 services:
-  db:
-    image: mongo
-    restart: always
-    volumes:
-       - db_data:/data/db
   app:
     image: tmannherz/doc-store-base
     depends_on:
       - db
-    restart: "no"
+    restart: always
     ports:
       - "8080:8080"
       - "8181:8181"
@@ -27,6 +22,12 @@ services:
       - gcloud_service_account
 #      - server_ssl_certificate
 #      - server_ssl_key
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+       - db_data:/data/db
 
 secrets:
   gcloud_project:

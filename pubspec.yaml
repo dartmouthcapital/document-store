@@ -9,6 +9,7 @@ environment:
 dependencies:
   args:
   connection_pool:
+  cron:
   crypto:
   dart_config:
   dart_ext:
