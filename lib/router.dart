@@ -13,13 +13,14 @@ Router appRouter = router()
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
         if (await doc.load()) {
-            try {
-                return new Response.ok(doc.streamContent(), headers: {'content-type': doc.contentType});
-            } on HttpException catch (e) { // ignore: conflicting_dart_import
-                throw e;
-            } catch (e) {
-                print(e);
+            List<int> content = [];
+            await for (var bytes in doc.streamContent()) {
+                content.addAll(bytes);
             }
+            return new Response.ok(content, headers: {'content-type': doc.contentType});
+            // the below doesn't work because the server can't handle errors
+            // mid-stream, ex. the doc exists in the DB but not GCloud
+            //return new Response.ok(doc.streamContent(), headers: {'content-type': doc.contentType});
         }
         throw new NotFoundException();
     }, middleware: _authMw)

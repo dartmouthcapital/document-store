@@ -18,10 +18,11 @@ main() async {
 
     const String username = 'tester';
     const String password = 'secret';
-    new User()
+    User user = new User()
         ..username = username
-        ..password = password
-        ..save();
+        ..password = password;
+
+    await user.save();
 
     Request createRequest(String method, String path, {String body: '', Map headers: null, bool noAuth: false}) {
         if (headers == null) {

@@ -4,7 +4,6 @@ import 'helper.dart';
 
 main() async {
     await initTestConfig();
-    await new User()..resource.truncate();
 
     test('Constructors, getters and setters', () {
         var user = new User('abcdef');
@@ -23,6 +22,7 @@ main() async {
     });
 
     test('Save, load and delete cycle', () async {
+        await new User().deleteByUsername('test_user');
         // save
         var user = new User()
             ..username = 'test_user'
@@ -48,6 +48,7 @@ main() async {
     });
 
     test('Register user', () async {
+        await new User().deleteByUsername('reg_user');
         String username = 'reg_user';
         User user = new User();
         String id = await user.register(username, 'secret');
@@ -58,6 +59,7 @@ main() async {
     });
 
     test('Load and delete by username', () async {
+        await new User().deleteByUsername('load_user');
         String username = 'load_user';
         User user = new User()
             ..username = username

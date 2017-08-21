@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert' show BASE64;
 import 'dart:math' show Random;
+import 'dart:mirrors';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto show sha256;
 import 'package:googleapis_auth/auth_io.dart';
@@ -113,7 +114,12 @@ class GCloudStore extends EncryptableStoreResource {
     }
 
     _handleException(e) {
-        if (e is HttpException || e is Error) {
+        Type type = e.runtimeType;
+        ClassMirror mirror = reflectClass(type);
+        Symbol symbol = mirror.qualifiedName;
+        String eName = MirrorSystem.getName(symbol);
+        // check for a GCloud API error without explicitly including the lib
+        if ((e is HttpException || e is Error) && !eName.endsWith('DetailedApiRequestError')) {
             return e;
         }
         try {

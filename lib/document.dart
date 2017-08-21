@@ -109,20 +109,20 @@ class Document extends Model {
         } catch (e) {
             IOSink writeSink = _localStore.writeSink(name);
             Stream<List<int>> streamSave(Stream<List<int>> stream) async* {
-                await for (var data in stream) {
-                    writeSink.add(data);
-                    yield data;
+                try {
+                    await for (var data in stream) {
+                        writeSink.add(data);
+                        yield data;
+                    }
+                } catch (e) {
+                    writeSink.close().then((_) {
+                        _localStore.deleteSync(name);
+                    });
+                    throw e;
                 }
                 writeSink.close();
             }
-            try {
-                return streamSave(store.read(name));
-            } catch (f) {
-                writeSink.close().then((_) {
-                    _localStore.deleteSync(name);
-                });
-                throw f;
-            }
+            return streamSave(store.read(name));
         }
     }
 
