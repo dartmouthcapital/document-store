@@ -6,26 +6,48 @@ import '../resource.dart';
 /// MongoDB resource model
 class MongoResource implements DbResource {
     static MongoPool _pool;
+    String _dbName;
+    String _dbHost;
+    int _dbPoolSize = 4;
+    Map _dbAuth;
     String collectionName;
 
-    MongoResource(String databaseName, String databaseUrl, int databasePoolSize, {Map auth, String collection}) {
-        if (databaseName == null || databaseUrl == null) {
+    MongoResource(String databaseName, String databaseHost, int databasePoolSize, {Map auth, String collection}) {
+        if (databaseName == null || databaseHost == null) {
             throw new DbResourceException('Both database name and URL must be specified.');
         }
+        _dbName = databaseName;
+        _dbHost = databaseHost;
+        _dbPoolSize = databasePoolSize;
+        _dbAuth = auth;
         if (_pool == null) {
-            _pool = new MongoPool(
-                databaseUrl + databaseName,
-                databasePoolSize ?? 4,
-                auth != null ? auth['username'] : null,
-                auth != null ? auth['password'] : null,
-                auth != null ? auth['source'] : null
-            );
+            _connect();
         }
         collectionName = collection;
     }
 
+    /// Initialize the connection pool
+    _connect() {
+        _pool = new MongoPool(
+            _dbHost + _dbName,
+            _dbPoolSize ?? 4,
+            _dbAuth != null ? _dbAuth['username'] : null,
+            _dbAuth != null ? _dbAuth['password'] : null,
+            _dbAuth != null ? _dbAuth['source'] : null
+        );
+    }
+
     /// Insert a new object into the collection.
-    Future<String> insert(Map data) {
+    Future<String> insert(Map data) async {
+        try {
+            return _insert(data);
+        } on ConnectionException catch (e) {
+            _connect();
+            return _insert(data);
+        }
+    }
+
+    Future<String> _insert(Map data) {
         _checkCollection();
         assert(data['_id'] == null);
         data['_id'] = new ObjectId().toHexString();
@@ -41,7 +63,16 @@ class MongoResource implements DbResource {
     }
 
     /// Update an existing item in the collection.
-    Future<bool> update(Map data) {
+    Future<bool> update(Map data) async {
+        try {
+            return _update(data);
+        } on ConnectionException catch (e) {
+            _connect();
+            return _update(data);
+        }
+    }
+
+    Future<bool> _update(Map data) {
         _checkCollection();
         String id;
         if (data.containsKey('id')) {
@@ -65,7 +96,16 @@ class MongoResource implements DbResource {
     }
 
     /// Query the collection.
-    Future<List> find(Map query) {
+    Future<List> find(Map query) async {
+        try {
+            return _find(query);
+        } on ConnectionException catch (e) {
+            _connect();
+            return _find(query);
+        }
+    }
+
+    Future<List> _find(Map query) {
         _checkCollection();
         return _pool.getConnection().then((ManagedConnection mc) async {
             DbCollection collection = new DbCollection(mc.conn, collectionName);
@@ -90,7 +130,16 @@ class MongoResource implements DbResource {
     }
 
     /// Delete based on the provided query.
-    Future<bool> delete(Map query) {
+    Future<bool> delete(Map query) async {
+        try {
+            return _delete(query);
+        } on ConnectionException catch (e) {
+            _connect();
+            return _delete(query);
+        }
+    }
+
+    Future<bool> _delete(Map query) {
         _checkCollection();
         return _pool.getConnection().then((ManagedConnection mc) {
             Db database = mc.conn;
