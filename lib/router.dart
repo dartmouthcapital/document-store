@@ -9,6 +9,15 @@ import 'document.dart';
 import 'user.dart';
 
 Router appRouter = router()
+    ..get('/healthcheck', (Request request) async {
+        try {
+            User user = new User();
+            await user.loadByUsername('test');
+            return new Response.ok('Ok');
+        } catch (e) {
+            return new Response.internalServerError();
+        }
+    })
     ..get('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);

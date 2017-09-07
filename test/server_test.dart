@@ -55,6 +55,15 @@ main() async {
         });
     });
 
+    group('Testing healthcheck', () {
+        test('GET /healthcheck 200', () async {
+            Request request = createRequest('GET', '/healthcheck', noAuth: true);
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+            expect(await response.readAsString(), equals('Ok'));
+        });
+    });
+
     group('Testing authentication failure', () {
         test('GET / 400', () async {
             Request request = createRequest('GET', '/abc', headers: {'Authorization': 'badauth'});
