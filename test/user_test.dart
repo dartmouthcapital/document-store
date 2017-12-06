@@ -43,8 +43,7 @@ main() async {
         expect(user.passwordHash, equals('hash12345790'));
 
         // delete
-        var deleteResult = await user.delete();
-        expect(deleteResult, isTrue);
+        expect(await user.delete(), isTrue);
     });
 
     test('Register user', () async {

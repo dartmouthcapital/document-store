@@ -36,6 +36,9 @@ class Document extends Model {
             'id': _id,
             'content_type': contentType
         };
+        if (created != null) {
+            map['created'] = created.toUtc().toIso8601String();
+        }
         if (directory != null && directory.isNotEmpty) {
             map['directory'] = directory;
         }

@@ -22,6 +22,9 @@ class User extends Model {
             'username': username,
             'is_active': isActive
         };
+        if (created != null) {
+            data['created'] = created.toUtc().toIso8601String();
+        }
         if (password != null) {
             passwordHash = new DBCrypt().hashpw(password, new DBCrypt().gensalt());
         }
