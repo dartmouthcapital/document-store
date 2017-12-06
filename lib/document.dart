@@ -92,6 +92,11 @@ class Document extends Model {
         if (field != 'id') {
             throw 'Loading by a field other than ID is not supported.';
         }
+        // clear out existing attributes
+        contentType = null;
+        content = null;
+        directory = null;
+        encryptionKey = null;
         if (await super.load(id, field)) {
             if (encryptionKey.isEmpty) {  // document isn't encrypted
                 store.encryptionKey = '';
@@ -143,7 +148,7 @@ class Document extends Model {
         }
     }
 
-    /// Delete the document from the file store.
+    /// Delete the document from the file store and the local reference.
     /// Returns true if the document was found and deleted, and false otherwise.
     Future<bool> delete([String id = null, String field = 'id']) async {
         if (field != 'id') {
@@ -154,12 +159,26 @@ class Document extends Model {
         }
         if (await load()) {
             if (await store.delete(name)) {
-                _localStore.delete(name);  // clear local cache
+                await _localStore.delete(name);  // clear local cache
                 return super.delete();
             }
             throw 'Error deleting document.';
         }
         return false;
+    }
+
+    /// Delete the document from the file store only.
+    Future<bool> deleteFromStore() async {
+        if (_id == null) {
+            throw 'Cannot delete file without an ID.';
+        }
+        try {
+            await store.delete(name);
+            await _localStore.delete(name);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
     bool _canResize () {

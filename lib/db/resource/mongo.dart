@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:connection_pool/connection_pool.dart';
-import 'package:mongo_dart/mongo_dart.dart';
+// mongo_dart also has a ConnectionPool class as of 0.3.1
+import 'package:mongo_dart/mongo_dart.dart' show ConnectionException, Db, DbCollection, ObjectId;
 import '../resource.dart';
 
 /// MongoDB resource model

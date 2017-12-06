@@ -4,6 +4,7 @@ import 'dart:io' show HttpStatus;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_exception_handler/shelf_exception_handler.dart';
 import 'package:test/test.dart';
+import '../lib/document.dart';
 import '../lib/store/resource.dart';
 import '../lib/router.dart' as app;
 import '../lib/user.dart';
@@ -84,6 +85,12 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
         });
 
+        test('PUT / 401', () async {
+            Request request = createRequest('PUT', '/abc', headers: {'Authorization': auth});
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.UNAUTHORIZED));
+        });
+
         test('DELETE / 401', () async {
             Request request = createRequest('DELETE', '/abc', headers: {'Authorization': auth});
             Response response = await handler(request);
@@ -100,6 +107,12 @@ main() async {
 
         test('POST /bad/route', () async {
             Request request = createRequest('POST', '/bad/route');
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.NOT_FOUND));
+        });
+
+        test('PUT /bad/route', () async {
+            Request request = createRequest('PUT', '/bad/route');
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.NOT_FOUND));
         });
@@ -124,8 +137,8 @@ main() async {
     });
 
     group('Testing 405 routes', () {
-        test('PUT /bad/route', () async {
-            Request request = createRequest('PUT', '/bad/route');
+        test('PATCH /bad/route', () async {
+            Request request = createRequest('PATCH', '/bad/route');
             Response response = await handler(request);
             expect(response.statusCode, equals(HttpStatus.METHOD_NOT_ALLOWED));
         });
@@ -201,6 +214,34 @@ main() async {
             expect(response.statusCode, equals(HttpStatus.OK));
             String body = await response.readAsString();
             expect(body, equals('test file contents'));
+        });
+    });
+
+    group('Testing PUT', () {
+        test('PUT existing document', () async {
+            Document doc = new Document()
+                ..content = UTF8.encode('"foo"')
+                ..contentType = 'application/json';
+            await doc.save();
+            String id = doc.id;
+
+            Request request = createRequest(
+                'PUT',
+                '/' + id,
+                body: 'new content',
+                headers: {'content-type': 'text/plain'}
+            );
+            Response response = await handler(request);
+            expect(response.statusCode, equals(HttpStatus.OK));
+            Map body = JSON.decode(await response.readAsString());
+            expect(body.containsKey('id'), isTrue);
+            expect(body['id'], equals(id));
+            expect(body.containsKey('content_type'), isTrue);
+            expect(body['content_type'], equals('text/plain'));
+
+            bool loadResult = await doc.load(id);
+            expect(loadResult, isTrue);
+            expect(doc.contentType, equals('text/plain'));
         });
     });
 

@@ -53,6 +53,29 @@ Router appRouter = router()
         }
         throw new HttpException(); // ignore: conflicting_dart_import
     }, middleware: _authMw)
+    ..put('/{id}', (Request request) async {
+        String id = getPathParameter(request, 'id');
+        Document doc = new Document(id);
+        if (await doc.load()) {
+            await doc.deleteFromStore();
+            var bin = new BytesBuilder(),
+                contentType = request.mimeType;
+            if (contentType == null || contentType.isEmpty) {
+                throw new BadRequestException(null, 'Content-type header must be set.');
+            }
+            await for (var bytes in request.read()) {
+                bin.add(bytes);
+            }
+            doc..contentType = contentType
+               ..content = bin.toBytes();
+
+            if (await doc.save()) {
+                return new Response.ok(doc.toJson(), headers: {'content-type': 'application/json'});
+            }
+            throw new HttpException(); // ignore: conflicting_dart_import
+        }
+        throw new NotFoundException();
+    }, middleware: _authMw)
     ..delete('/{id}', (Request request) async {
         String id = getPathParameter(request, 'id');
         Document doc = new Document(id);
@@ -87,7 +110,7 @@ Middleware appMiddleware = createMiddleware(
 );
 
 Response _reqHandler(Request request) {
-    List allowed = ['GET', 'POST', 'DELETE', 'OPTIONS'];
+    List allowed = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
     if (!allowed.contains(request.method)) {
         throw new MethodNotAllowed();
     }
@@ -102,5 +125,5 @@ Map CORSHeader = {
     //'content-type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-    'Access-Control-Allow-Methods': 'POST, GET, DELETE, OPTIONS'
+    'Access-Control-Allow-Methods': 'POST, PUT, GET, DELETE, OPTIONS'
 };

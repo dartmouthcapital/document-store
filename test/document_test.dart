@@ -83,9 +83,11 @@ main() async {
     });
 
     test('Loading non-existing documents', () async {
-        var doc = new Document('abcdef');
+        var doc = new Document('abcdef')
+            ..contentType = 'text/plain';
         var result = await doc.load();
         expect(result, isFalse);
+        expect(doc.contentType, isNull);
     });
 
     test('Saving non-existing documents and updates', () async {
