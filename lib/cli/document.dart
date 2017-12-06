@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
 import '../document.dart';
+import '../mime_type.dart' as mime;
 import '../store/resource.dart';
 
 /// Top-level document command
@@ -9,9 +10,93 @@ class DocumentCommand extends Command {
     final String description = 'Manage Document records.';
 
     DocumentCommand() {
+        addSubcommand(new CreateCommand());
+        addSubcommand(new UpdateCommand());
         addSubcommand(new InfoCommand());
         addSubcommand(new DeleteCommand());
         addSubcommand(new PurgeCacheCommand());
+    }
+}
+
+/// Command to create a document.
+class CreateCommand extends Command {
+    final String name = 'create';
+    final String description = 'Create a Document.';
+
+    CreateCommand() {
+        argParser
+            ..addOption('file', abbr: 'f', help: 'Path to local file to add to storage.')
+            ..addOption('directory', abbr: 'd', help: 'Storage bucket subdirectory.');
+    }
+
+    run() async {
+        String filePath = argResults['file'],
+               directory = argResults['directory'];
+        if (filePath == null) {
+            throw new UsageException(
+                '"file" must be set.',
+                'create -f /path/to/file.txt'
+            );
+        }
+        File file = new File(filePath);
+        if (!file.existsSync()) {
+            throw new Exception('Input file "$filePath" does not exist.');
+        }
+        Document doc = new Document()
+            ..contentType = mime.contentType(file.path)
+            ..content = await file.readAsBytes();
+        if (directory != null) {
+            doc.directory = directory;
+        }
+        await doc.save();
+        print(doc.toJson().toString());
+        exit(0);
+    }
+}
+
+/// Command to update a document.
+class UpdateCommand extends Command {
+    final String name = 'update';
+    final String description = 'Update a Document.';
+
+    UpdateCommand() {
+        argParser
+            ..addOption('id', abbr: 'i', help: 'ID of Document to replace.')
+            ..addOption('file', abbr: 'f', help: 'Path to local file to add to storage.');
+    }
+
+    run() async {
+        String id = argResults['id'],
+               filePath = argResults['file'];
+        if (id == null) {
+            throw new UsageException(
+                '"id" must be set.',
+                'update -i "123456" ...'
+            );
+        }
+        if (filePath == null) {
+            throw new UsageException(
+                '"file" must be set.',
+                'update -f /path/to/file.txt ...'
+            );
+        }
+        File file = new File(filePath);
+        if (!file.existsSync()) {
+            throw new Exception('Input file "$filePath" does not exist.');
+        }
+        Document doc = new Document(id);
+        if (await doc.load()) {
+            await doc.deleteFromStore();
+            doc..contentType = mime.contentType(file.path)
+               ..content = await file.readAsBytes();
+            await doc.save();
+            print(doc.toJson().toString());
+            exit(0);
+        }
+        else {
+            print('Document "$id" does not exist.');
+            exit(1);
+        }
     }
 }
 
@@ -25,7 +110,7 @@ class InfoCommand extends Command {
     }
 
     run() async {
-        var id = argResults['id'];
+        String id = argResults['id'];
         if (id == null) {
             throw new UsageException(
                 '"id" must be set.',
@@ -54,7 +139,7 @@ class DeleteCommand extends Command {
     }
 
     run() async {
-        var id = argResults['id'];
+        String id = argResults['id'];
         if (id == null) {
             throw new UsageException(
                 '"id" must be set.',

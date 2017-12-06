@@ -73,9 +73,29 @@ Available commands:
 ### Managing Documents
 
 Available subcommands:
+* `create`      - Create a Document.
+* `update`      - Update a Document.
 * `delete`      - Delete a Document.
 * `info`        - View Document details.
 * `purge_cache` - Purge the local file cache.
+
+#### Create
+
+Usage: `ds-cli document create [arguments]`
+
+```
+-f, --file         Path to local file to add to storage.
+-d, --directory    Storage bucket subdirectory.
+```
+
+#### Update
+
+Usage: `ds-cli document update [arguments]`
+
+```
+-i, --id           ID of Document to replace.
+-f, --file         Path to local file to add to storage.
+```
 
 #### Delete
 
