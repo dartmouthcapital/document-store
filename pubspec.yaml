@@ -1,7 +1,8 @@
 name: document_store
-description: An interface for serving and storing documents.
+description: Service to manage file storage in the Google Cloud.
 version: 0.0.1
 author: Todd Mannherz <todd.mannherz@gmail.com>
+homepage: https://github.com/tmannherz/document-store
 
 environment:
   sdk: '>=1.20.1 <2.0.0'
@@ -18,6 +19,7 @@ dependencies:
   googleapis_auth:
   http:
   image:
+  mime_types:
   mongo_dart:
   option:
   shelf_auth:

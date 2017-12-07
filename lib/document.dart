@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:http_exception/http_exception.dart';
 import 'package:image/image.dart';
+import 'package:mime_types/mime_types.dart' as mime;
 import 'config.dart';
 import 'db/model.dart';
-import 'mime_type.dart' as mime;
 import 'store/local.dart';
 import 'store/resource.dart';
 

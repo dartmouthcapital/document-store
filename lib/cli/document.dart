@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
+import 'package:mime_types/mime_types.dart' as mime;
 import '../document.dart';
-import '../mime_type.dart' as mime;
 import '../store/resource.dart';
 
 /// Top-level document command
