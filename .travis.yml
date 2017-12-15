@@ -15,3 +15,5 @@ env:
   - DB_MONGODB_DB_NAME=documents_test
 services:
   - mongodb
+before_script:
+  - mkdir -p $TRAVIS_BUILD_DIR/var $TRAVIS_BUILD_DIR/var/doc_cache $TRAVIS_BUILD_DIR/var/test_cache

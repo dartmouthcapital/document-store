@@ -87,8 +87,8 @@ main() async {
         expect(await user.authenticate(username, 'secret'), isTrue);
         expect(await user.authenticate(username, 'badpw'), isFalse);
         expect(await user.authenticate('bad_user', 'secret'), isFalse);
-        user..isActive = false
-            ..save();
+        user.isActive = false;
+        await user.save();
         expect(await user.authenticate(username, 'secret'), isFalse);  // not active
     });
 }
