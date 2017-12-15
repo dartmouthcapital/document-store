@@ -17,3 +17,4 @@ services:
   - mongodb
 before_script:
   - mkdir -p $TRAVIS_BUILD_DIR/var $TRAVIS_BUILD_DIR/var/doc_cache $TRAVIS_BUILD_DIR/var/test_cache
+  - chmod -R 777 $TRAVIS_BUILD_DIR/var
