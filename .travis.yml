@@ -11,5 +11,7 @@ branches:
 cache:
   directories:
     - $HOME/.pub-cache
+env:
+  - DB_MONGODB_DB_NAME=documents_test
 services:
   - mongodb
