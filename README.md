@@ -1,5 +1,7 @@
 # Document Store
 
+[![Build Status](https://travis-ci.org/tmannherz/document-store.svg?branch=master)](https://travis-ci.org/tmannherz/document-store)
+
 A service for serving and storing documents from the Google Cloud.
 
 ## Installation + Configuration
