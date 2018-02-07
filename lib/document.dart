@@ -202,20 +202,13 @@ class Document extends Model {
             // Until https://github.com/brendan-duncan/image/issues/41 is fixed, 8-bit PNGs are
             // corrupted by the images package. Clone the content here so it's not affected.
             List<int> imageData = new List.from(content);
+            Decoder decoder = findDecoderForData(imageData);
+            if (decoder == null) {
+                throw new UnsupportedMediaTypeException();
+            }
             try {
-                switch (contentType) {
-                    case 'image/png':
-                        original = new PngDecoder().decodeImage(imageData);
-                        break;
-                    case 'image/jpeg':
-                        original = new JpegDecoder().decodeImage(imageData);
-                        break;
-                    case 'image/gif':
-                        original = new GifDecoder().decodeImage(imageData);
-                        break;
-                    default:
-                        original = decodeImage(imageData);
-                }
+                original = decoder.decodeImage(imageData);
+                contentType = _decoderToContentType(decoder);
             } catch (e) {
                 throw new UnsupportedMediaTypeException();
             }
@@ -247,5 +240,18 @@ class Document extends Model {
                 }
             }
         }
+    }
+
+    String _decoderToContentType (Decoder decoder) {
+        if (decoder is JpegDecoder) {
+            return 'image/jpeg';
+        }
+        if (decoder is PngDecoder) {
+            return 'image/png';
+        }
+        if (decoder is GifDecoder) {
+            return 'image/gif';
+        }
+        throw new Exception('Decoder format not supported.');
     }
 }

@@ -157,6 +157,16 @@ main() async {
         expect(image.height > image.width, isTrue);
     });
 
+    test('Image content type mismatch handled', () async {
+        var imageData = new File('test/documents/test_x300.jpg').readAsBytesSync();
+        Document doc = new Document()
+            ..content = imageData
+            ..contentType = 'image/png';
+
+        await doc.save();
+        expect(doc.contentType, equals('image/jpeg'));
+    });
+
     test('Bad image data is handled', () async {
         List<int> bytes = UTF8.encode('test file contents');
         Document doc = new Document()
