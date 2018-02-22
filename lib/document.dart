@@ -212,6 +212,9 @@ class Document extends Model {
             } catch (e) {
                 throw new UnsupportedMediaTypeException();
             }
+            if (original == null) {
+                throw new UnsupportedMediaTypeException();
+            }
             if (original.width > maxWidth || original.height > maxWidth) {
                 int newWidth, newHeight;
                 if (original.width >= original.height) {
